@@ -1,0 +1,35 @@
+/* App.css */
+.app-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.content {
+    margin-left: 250px; /* Adjust based on sidebar width */
+    transition: margin-left 0.3s;
+}
+
+.sidebar-closed ~ .content {
+    margin-left: 0;
+}
+
+.sidebar {
+    width: 250px;
+    background-color: #f0f4f8;
+    color: #333;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    overflow-y: auto;
+    padding-top: 20px;
+    transition: width 0.3s;
+}
+
+.sidebar-closed {
+    width: 80px; /* Adjust width when sidebar is closed */
+}
+
+.sidebar-open {
+    width: 250px; /* Full width when sidebar is open */
+}

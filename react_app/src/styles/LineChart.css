@@ -1,0 +1,22 @@
+/* LineChart.css */
+.chart-container {
+  width: 100%;
+  max-width: 500px; /* Adjust the maximum width as needed */
+  max-height: 100px; /* Adjust height as needed */
+  margin: 0 auto; /* Center align the chart */
+ margin-left: -2px;
+  padding: 5px; /* Add some padding around the chart */
+  box-sizing: border-box; /* Include padding in the element's total width and height */
+}
+
+@media (max-width: 768px) {
+  .chart-container {
+    height: 300px; /* Adjust height for smaller screens */
+  }
+}
+
+@media (max-width: 480px) {
+  .chart-container {
+    height: 250px; /* Further adjustment for very small screens */
+  }
+}

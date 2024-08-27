@@ -1,0 +1,32 @@
+.dashboard {
+  padding: 20px;
+  background-color: #f4f4f4;
+  min-height: 100vh;
+  margin-left: 250px; /* Default width of the sidebar */
+  box-sizing: border-box; /* Include padding in width calculation */
+  transition: margin-left 0.3s ease; /* Smooth transition for sidebar toggle */
+}
+
+.dashboard-heading {
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.dashboard-content {
+  display: flex;
+  flex-direction: column; /* Column direction to stack cards and chart */
+  gap: 20px; /* Space between elements */
+}
+
+/* When sidebar is closed */
+.sidebar-closed .dashboard {
+  margin-left: 60px; /* Adjust based on the width of the closed sidebar */
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+  .dashboard {
+    margin-left: 0; /* Full width on smaller screens */
+  }
+}

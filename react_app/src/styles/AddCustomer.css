@@ -1,0 +1,172 @@
+/* AddCustomerForm.css */
+.page-container {
+    max-width: 90%;
+    margin: 70px auto 20px;
+    padding: 20px;
+    transition: margin-left 0.3s;
+}
+
+.form-container {
+    margin-bottom: 20px;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ddd;
+}
+
+.form-heading {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333;
+    text-align: center;
+}
+
+.customer-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.image-preview img {
+    max-width: 100%;
+    max-height: 200px;
+    display: block;
+    margin-top: 10px;
+}
+
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+.form-group textarea {
+    resize: vertical;
+    height: 100px;
+}
+
+.submit-btn {
+    background: linear-gradient(0deg, rgba(20,167,62,1) 0%, rgba(102,247,113,1) 100%);
+    color: white;
+    padding: 0.7em 1.4em;
+    border: none;
+    border-radius: 20em;
+    font-size: 16px;
+    cursor: pointer;
+    transition: box-shadow 0.3s;
+    margin-top: 20px;
+    width: 100%;
+    max-width: 200px;
+    align-self: center;
+}
+
+.submit-btn:hover {
+    box-shadow: 0 0.5em 1.5em -0.5em #14a73e98;
+}
+
+.submit-btn:active {
+    box-shadow: 0 0.3em 1em -0.5em #14a73e98;
+}
+
+.map-container {
+    height: 300px;
+    width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.error-message {
+    color: red;
+    margin-top: 10px;
+}
+
+/* Responsive styles */
+@media (min-width: 1025px) {
+    .page-container {
+        max-width: 800px;
+        margin-left: calc(250px + (100vw - 250px - 800px) / 2);
+    }
+}
+
+@media (max-width: 1024px) {
+    .page-container {
+        margin-left: 270px;
+        width: calc(100% - 290px);
+    }
+}
+
+@media (max-width: 768px) {
+    .page-container {
+        margin-left: 80px;
+        margin-top: 65px;
+        padding: 10px;
+        width: calc(100% - 100px);
+    }
+
+    .form-container {
+        padding: 15px;
+    }
+
+    .form-heading {
+        font-size: 20px;
+    }
+
+    .submit-btn {
+        font-size: 14px;
+    }
+
+    .map-container {
+        height: 250px;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-container {
+        margin-left: 0;
+        margin-top: 45px;
+        width: 100%;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        font-size: 14px;
+    }
+}
+
+/* Styles for when sidebar is closed */
+.sidebar-closed .page-container {
+    margin-left: 100px;
+    width: calc(100% - 120px);
+}
+
+@media (max-width: 768px) {
+    .sidebar-closed .page-container {
+        margin-left: 60px;
+        width: calc(100% - 80px);
+    }
+}
+
+@media (max-width: 480px) {
+    .sidebar-closed .page-container {
+        margin-left: 0;
+        width: 100%;
+    }
+}

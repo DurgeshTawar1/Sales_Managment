@@ -1,0 +1,32 @@
+.category-table-wrapper {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    margin-top: 70px; /* Adjust as needed to fit your layout */
+}
+
+.category-table-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Space between elements */
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* Align the search bar to the right */
+    margin-bottom: 20px; /* Space between search bar and table */
+}
+
+.search-bar input {
+    width: 300px; /* Adjust width as needed */
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-size: 1em;
+}
+
+.data-table {
+    margin-top: 20px; /* Space between the search bar and the DataTable */
+}
