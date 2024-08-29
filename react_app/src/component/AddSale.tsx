@@ -23,7 +23,7 @@ const paymentTypes: PaymentType[] = [
 
 const AddSale: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
-  const [customer, setCustomer] = useState<string | null>(null);
+   const [customer, setCustomer] = useState<string | null>(null);
   const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [discountPercent, setDiscountPercent] = useState<number>(0);
   const [discountFlat, setDiscountFlat] = useState<number>(0);
@@ -35,7 +35,7 @@ const AddSale: React.FC = () => {
   const [orderNo, setOrderNo] = useState<string>('');
   const [status, setStatus] = useState<string>('Pending');
   const [paymentType, setPaymentType] = useState<number | null>(null);
-  const [image, setImage] = useState<File | null>(null);
+   const [image, setImage] = useState<File | null>(null);
   const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
 
   const handleAddProduct = () => {
@@ -57,7 +57,12 @@ const AddSale: React.FC = () => {
 
   const handleSave = () => {
     console.log('Saving sale...');
-    // Implement save functionality here
+    console.log('Selected Customer:', customer);
+    if (image) {
+      console.log('Selected Image:', image.name);
+     
+    }
+   
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -74,7 +79,7 @@ const AddSale: React.FC = () => {
     return { subtotal, discount, tax, total };
   };
 
-  const { subtotal, discount, tax, total } = calculateTotals();
+   const { total } = calculateTotals();
   const profit = total - customerPaid;
 
   return (

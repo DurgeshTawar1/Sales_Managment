@@ -31,6 +31,7 @@ NavBar::begin([
 
 $menuItems = [
     ['label' => 'Home', 'url' => ['/site/index']],
+    ['label' => 'react', 'url' => ['/react']],
 ];
 
 if (Yii::$app->user->isGuest) {

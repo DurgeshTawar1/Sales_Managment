@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
 import "../styles/Purchase.css";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 import Loader from './Loader'; // Import the Loader component
+import { addPurchase, Purchase } from '../Api/PurchaseApi';
 
 // Define the types for form data
 interface FormData {
   productName: string;
   supplier: string;
-  quantity: number;
-  productCost: number;
-  sellingPrice: number;
+  quantity: string;
+  productCost: string;
+  sellingPrice: string;
   purchaseDate: string;
   expiryDate: string;
 }
@@ -17,38 +21,89 @@ const AddPurchase: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
     productName: '',
     supplier: '',
-    quantity: 0,
-    productCost: 0,
-    sellingPrice: 0,
+    quantity: '',
+    productCost: '',
+    sellingPrice: '',
     purchaseDate: '',
     expiryDate: '',
   });
 
   const [loading, setLoading] = useState<boolean>(false);
+  // const [error, setError] = useState<string | null>(null);
 
   // Handle input change
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: name === 'quantity' || name === 'productCost' || name === 'sellingPrice' ? +value : value,
+      [name]: value,
     });
   };
 
   // Handle form submission
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    // Simulate form submission
-    setTimeout(() => {
-      console.log('Form Data Submitted:', formData);
+    // setError(null);
+
+    // Check for empty fields
+    const requiredFields = [
+      { name: 'productName', label: 'Product Name' },
+      { name: 'supplier', label: 'Supplier' },
+      { name: 'quantity', label: 'Quantity' },
+      { name: 'productCost', label: 'Product Cost' },
+      { name: 'sellingPrice', label: 'Selling Price' },
+      { name: 'purchaseDate', label: 'Purchase Date' },
+      { name: 'expiryDate', label: 'Expiry Date' }
+    ];
+
+    let hasError = false;
+
+    requiredFields.forEach(field => {
+       if (!formData[field.name as keyof FormData]) {
+        toast.error(`${field.label} is required`);
+        hasError = true;
+      }
+    });
+
+    if (hasError) {
       setLoading(false);
-    }, 2000);
+      return;
+    }
+
+    try {
+      const purchaseData: Omit<Purchase, '_id'> = {
+        product: formData.productName,
+        supplier: formData.supplier,
+        quantity: formData.quantity,
+        productCost: formData.productCost ,
+        sellPrice : formData.sellingPrice,
+        purchaseDate: formData.purchaseDate,
+        productExpiry: formData.expiryDate,
+      };
+
+      await addPurchase(purchaseData);
+      toast.success('Purchase added successfully');
+      setFormData({
+        productName: '',
+        supplier: '',
+        quantity: '',
+        productCost: '',
+        sellingPrice: '',
+        purchaseDate: '',
+        expiryDate: '',
+      });
+    } catch (error) {
+      toast.error('Failed to add purchase. Please try again.');
+      console.error('Error adding purchase:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="card">
-      <h2>Add Product</h2>
+    <div className="card" style={{ marginTop: "60px", marginLeft: "300px" }}>
+      <h2 style={{ display: "flex", alignItems: "center" }}>Add Purchase</h2>
       <form onSubmit={handleSubmit}>
         <div className="form-row">
           <div className="form-group">
@@ -87,7 +142,6 @@ const AddPurchase: React.FC = () => {
               value={formData.quantity}
               onChange={handleChange}
               placeholder="Enter quantity"
-              required
             />
           </div>
         </div>
@@ -102,7 +156,6 @@ const AddPurchase: React.FC = () => {
               value={formData.productCost}
               onChange={handleChange}
               placeholder="Enter product cost"
-              required
             />
           </div>
           <div className="form-group">
@@ -115,7 +168,6 @@ const AddPurchase: React.FC = () => {
               value={formData.sellingPrice}
               onChange={handleChange}
               placeholder="Enter selling price"
-              required
             />
           </div>
           <div className="form-group">
@@ -149,6 +201,7 @@ const AddPurchase: React.FC = () => {
           {loading ? 'Saving...' : 'Save'}
         </button>
         {loading && <Loader />} {/* Display loader when loading */}
+        <ToastContainer />
       </form>
     </div>
   );

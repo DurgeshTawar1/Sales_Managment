@@ -1,22 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import DataTable, { TableColumn } from 'react-data-table-component';
+import { DataGrid, GridColDef, GridPaginationModel } from '@mui/x-data-grid';
 import styled from 'styled-components';
-import Loader from './Loader'; // Import the Loader component
+import { getAllSuppliers, deleteSupplier, Supplier } from '../Api/SupplierApi'; // Import Supplier API functions
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 
-interface CustomerData {
-  id: number;
-  name: string;
-  contact: string;
-  email: string;
-  advancedPaid: number;
-}
+// Styled components
+const SearchInput = styled.input`
+  width: 100%;
+  max-width: 200px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-size: 1em;
+  margin-bottom: 20px;
+`;
 
 const AddButton = styled.button`
   background-color: #4CAF50;
   border: none;
   color: white;
-  padding: 20px 40px;
+  padding: 10px 20px;
   text-align: center;
   text-decoration: none;
   display: inline-block;
@@ -31,8 +37,46 @@ const AddButton = styled.button`
   }
 `;
 
+const EditButton = styled.button`
+  background-color: #FFC107;
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 14px;
+  margin: 2px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: #e0a800;
+  }
+`;
+
+const DeleteButton = styled.button`
+  background-color: #F44336;
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 14px;
+  margin: 2px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: #c62828;
+  }
+`;
+
 const Container = styled.div`
-  margin-top: 50px; /* Increased top margin */
+  margin-top: 70px; /* Adjust as needed */
   padding: 20px;
 `;
 
@@ -40,120 +84,126 @@ const Header = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 30px; /* Increased bottom margin */
+  margin-bottom: 30px;
 `;
 
 const SupplierTable: React.FC = () => {
-  const navigate = useNavigate();
-  const [loading, setLoading] = useState(true); // Add loading state
-  const [data, setData] = useState<CustomerData[]>([]);
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({  
+    pageSize: 5,
+      page: 0,
 
-  const handleAddCustomer = () => {
-    navigate('/add-purchase');
-  };
+  });
+  const navigate = useNavigate();
 
   useEffect(() => {
-    setTimeout(() => {
-      const dummyData: CustomerData[] = [
-        {
-          id: 1,
-          name: "John Doe",
-          contact: "123-456-7890",
-          email: "john@example.com",
-          advancedPaid: 500,
-        },
-        {
-          id: 2,
-          name: "Jane Smith",
-          contact: "987-654-3210",
-          email: "jane@example.com",
-          advancedPaid: 750,
-        },
-        // Add more dummy data if needed
-      ];
-      setData(dummyData);
-      setLoading(false); // Set loading to false after data is fetched
-    }, 2000); // Simulate a 2-second delay
+    const fetchSuppliers = async () => {
+      try {
+        const data = await getAllSuppliers();
+        setSuppliers(data);
+        setLoading(false);
+      } catch (error) {
+        setError('Failed to load suppliers.');
+        setLoading(false);
+        console.error('Error fetching suppliers:', error);
+      }
+    };
+
+    fetchSuppliers();
   }, []);
 
-  const columns: TableColumn<CustomerData>[] = [
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const handleEdit = (id: string) => {
+    console.log('Edit supplier with id:', id);
+    navigate(`/edit-supplier/${id}`);
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteSupplier(id);
+      setSuppliers(prevSuppliers => prevSuppliers.filter(supplier => supplier.id !== id));
+    } catch (error) {
+      setError('Failed to delete supplier.');
+      console.error('Error deleting supplier:', error);
+    }
+  };
+
+  const handleOpenAddSupplier = () => {
+    navigate('/add-supplier');
+  };
+  const handlePaginationModelChange = (newModel: GridPaginationModel) => {
+    setPaginationModel(newModel);
+};
+  const filteredSuppliers = suppliers.filter(supplier =>
+    supplier.supplierName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const columns: GridColDef[] = [
+    { field: 'SNO', headerName: 'ID', width: 70 },
+    { field: 'supplierName', headerName: 'Supplier Name', width: 150 },
+    { field: 'phone', headerName: 'Phone', width: 150 },
+    { field: 'email', headerName: 'Email', width: 200 },
+    { field: 'address', headerName: 'Address', width: 250 },
     {
-      name: 'Product Name',
-      selector: row => row.name,
-      sortable: true,
-    },
-    {
-      name: 'Quantity',
-      selector: row => row.contact,
-    },
-    {
-      name: 'Cost',
-      selector: row => row.email,
-    },
-    {
-      name: 'Sell',
-      selector: row => row.advancedPaid,
-      sortable: true,
-      right: true,
-      format: row => `$${row.advancedPaid.toFixed(2)}`,
-    },
-    {
-      name: 'Purchase',
-      selector: row => row.advancedPaid,
-      sortable: true,
-      right: true,
-      format: row => `$${row.advancedPaid.toFixed(2)}`,
-    },
-    {
-      name: 'Expiry',
-      selector: row => row.email, // Placeholder for date, adjust as necessary
-    },
+      field: 'actions',
+      headerName: 'Actions',
+      width: 150,
+      renderCell: (params) => (
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <EditButton onClick={() => handleEdit(params.id as string)}>
+            <EditIcon fontSize="small" />
+          </EditButton>
+          <DeleteButton onClick={() => handleDelete(params.id as string)}>
+            <DeleteIcon fontSize="small" />
+          </DeleteButton>
+        </div>
+      )
+    }
   ];
 
-  const customStyles = {
-    table: {
-      style: {
-        minWidth: '300px',
-        maxWidth: '800px',
-        margin: '0 auto',
-      },
-    },
-    headRow: {
-      style: {
-        fontSize: '14px',
-        fontWeight: 'bold',
-      },
-    },
-    rows: {
-      style: {
-        fontSize: '13px',
-        minHeight: '40px',
-      },
-    },
-  };
+  const rows = filteredSuppliers.map((supplier, index) => ({
+    id: supplier.id,
+    SNO: index + 1,
+    supplierName: supplier.supplierName,
+    phone: supplier.phone,
+    email: supplier.email,
+    address: supplier.address,
+  }));
 
   return (
     <Container>
       <Header>
-        <h2>Customer List</h2>
-        <AddButton onClick={handleAddCustomer}>Add Customer</AddButton>
+        <h2>Supplier List</h2>
+        <div style={{ display: 'flex', gap: '15px', justifyContent: 'center' }}>
+          <SearchInput
+            type="text"
+            placeholder="Search suppliers..."
+            value={searchTerm}
+            onChange={handleSearch}
+          />
+          <AddButton onClick={handleOpenAddSupplier}>Add Supplier</AddButton>
+        </div>
       </Header>
-      {loading ? (
-        <Loader /> 
-      ) : (
-        <DataTable
-          columns={columns}
-          data={data}
-          pagination
-          paginationPerPage={5}
-          paginationRowsPerPageOptions={[5, 10, 15]}
-          highlightOnHover
-          striped
-          responsive
-          customStyles={customStyles}
-          dense
-        />
-      )}
+      {loading && <p>Loading...</p>}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      <div style={{ height: 300, width: '100', marginLeft: '300px'}}>
+
+      <DataGrid
+                    rows={rows}
+                    columns={columns}
+                    paginationModel={paginationModel}
+                    onPaginationModelChange={handlePaginationModelChange}
+                    pageSizeOptions={[5, 10, 15]}
+                    checkboxSelection
+                    sx={{ overflow: 'clip' }}
+                />
+      </div>
     </Container>
   );
 };

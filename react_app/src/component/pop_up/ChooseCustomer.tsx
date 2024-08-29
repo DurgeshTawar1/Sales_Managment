@@ -82,6 +82,7 @@ const CustomerSelectPopup: React.FC<CustomerSelectPopupProps> = ({ isOpen, onClo
       );
     } else {
       setFilteredCustomers([]);
+      console.log(setCustomers);
     }
   }, [searchTerm, customers]);
 

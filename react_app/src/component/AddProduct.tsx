@@ -3,7 +3,7 @@ import axios from 'axios';
 import Barcode from 'react-barcode'; // Import Barcode component
 
 const AddProduct: React.FC = () => {
-    const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
+    // const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [image, setImage] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);

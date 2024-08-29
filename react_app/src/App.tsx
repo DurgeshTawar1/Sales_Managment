@@ -29,11 +29,14 @@ const App: React.FC = () => {
   };
 
   return (
-    <Router>
+    <Router basename='/react'>
       <div>
         <Navbar onToggleSidebar={toggleSidebar} isSidebarOpen={sidebarOpen} />
         <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
         <Routes>
+          <Route path="/" element={<DashBoard />} />
+          <Route path="/dashboard" element={<DashBoard />} />
+          {/* <Route path="/" element={<h1>Home Page</h1>} /> */}
           <Route path="/add-customer" element={<AddCustomerForm />} />
           <Route path="/all-customer" element={<AllCustomer />} />
           <Route path="/add-product" element={<AddProduct />} />
@@ -48,8 +51,6 @@ const App: React.FC = () => {
           <Route path="/add-income" element={<AddIncome />} />
           <Route path="/add-supplier" element={<AddSupplier />} />
           <Route path="/all-supplier" element={<SupplierTable />} />
-          <Route path="/dashBoard" element={<DashBoard />} />
-          <Route path="/" element={<h1>Home Page</h1>} />
         </Routes>
       </div>
     </Router>

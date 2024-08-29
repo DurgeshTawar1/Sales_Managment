@@ -5,23 +5,20 @@ import axios from 'axios';
 import { debounce } from 'lodash';
 import 'leaflet/dist/leaflet.css';
 import "../styles/AddCustomer.css";
-import { createCustomer } from '../api/customer';
-
+import { toast } from 'react-toastify';
+import { createCustomer } from '../Api/CustomerApi';
 
 const AddCustomerForm: React.FC = () => {
     const [location, setLocation] = useState<string>('');
     const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
     const [error, setError] = useState<string | null>(null);
-    const [image, setImage] = useState<File | null>(null);
-    const [imagePreview, setImagePreview] = useState<string | null>(null);
-    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const debouncedHandleLocationChange = debounce(async (location: string) => {
         setError(null);
 
         if (location) {
             try {
-                const response = await axios.get(`https://nominatim.openstreetmap.org/search`, {
+                const response = await axios.get('https://nominatim.openstreetmap.org/search', {
                     params: {
                         q: location,
                         format: 'json',
@@ -53,65 +50,43 @@ const AddCustomerForm: React.FC = () => {
         setLocation(location);
         debouncedHandleLocationChange(location);
     };
-
-    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0] || null;
-        setImage(file);
     
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                const base64String = reader.result as string;
-                setImage(base64String); // Save base64 string to state
-                setImagePreview(base64String); // Optionally update preview
-            };
-            reader.readAsDataURL(file); // Convert file to base64 string
-        } else {
-            setImagePreview(null);
-        }
-    };
-    
-
-    const handleSubmit = async (event: React.FormEvent) => {
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        setIsSubmitting(true);
-        setError(null);
-
-        const formData = new FormData(event.target as HTMLFormElement);
         
-        const customerData: Customer = {
-            customerName: formData.get('name') as string,
-            customerContact: parseInt(formData.get('contact') as string),
-            gender: formData.get('gender') as string,
-            customerEmail: formData.get('email') as string,
-            notes: formData.get('notes') as string,
-            AdvancedPaid: formData.get('advanced-paid') as string,
-            discountRate: formData.get('discount-rate') as string,
-            location: location
-        }
-            
-
+        const form = event.currentTarget;
+        const formData = new FormData(form);
+    
+        // Create a FormData object and append each field
+        const customerFormData = new FormData();
+    
+        // Iterate over the FormData entries and append them to customerFormData
+        formData.forEach((value, key) => {
+            customerFormData.append(key, value);
+        });
+    
         try {
-            const response = await createCustomer(customerData);
-            console.log('Customer created:', response.data);
-            // Handle successful creation (e.g., show success message, redirect)
+            const response = await createCustomer(customerFormData);
+            console.log(response);
+            
+            toast.success('Customer added successfully!');
         } catch (error) {
-            console.error('Error creating customer:', error);
-            setError('Failed to create customer. Please try again.');
-        } finally {
-            setIsSubmitting(false);
+            toast.error('Failed to add customer. Please try again.');
+            console.error('Error adding customer:', error);
+            setError('Failed to add customer. Please try again.');
         }
-    };
+    }
+    
 
     const MapComponent = () => {
         const map = useMap();
-        
+
         useEffect(() => {
             if (coords) {
                 map.setView([coords.lat, coords.lng], 13);
             }
         }, [coords, map]);
-        
+
         return null;
     };
 
@@ -122,11 +97,11 @@ const AddCustomerForm: React.FC = () => {
                 <form className="customer-form" onSubmit={handleSubmit}>
                     <div className="form-group">
                         <label htmlFor="name">Customer Name</label>
-                        <input type="text" id="name" name="name" required />
+                        <input type="text" id="name" name="customerName" required />
                     </div>
                     <div className="form-group">
                         <label htmlFor="contact">Customer Contact</label>
-                        <input type="text" id="contact" name="contact" required />
+                        <input type="number" id="contact" name="customerContact" required />
                     </div>
                     <div className="form-group">
                         <label htmlFor="gender">Gender</label>
@@ -138,7 +113,7 @@ const AddCustomerForm: React.FC = () => {
                     </div>
                     <div className="form-group">
                         <label htmlFor="email">Customer Email</label>
-                        <input type="email" id="email" name="email" required />
+                        <input type="email" id="email" name="customerEmail" required />
                     </div>
                     <div className="form-group">
                         <label htmlFor="notes">Notes</label>
@@ -146,11 +121,11 @@ const AddCustomerForm: React.FC = () => {
                     </div>
                     <div className="form-group">
                         <label htmlFor="advanced-paid">Advanced Paid</label>
-                        <input type="number" id="advanced-paid" name="advanced-paid" />
+                        <input type="number" id="advanced-paid" name="AdvancedPaid" step="0.01" />
                     </div>
                     <div className="form-group">
                         <label htmlFor="discount-rate">Discount Rate</label>
-                        <input type="number" id="discount-rate" name="discount-rate" step="0.01" />
+                        <input type="number" id="discount-rate" name="discountRate" step="0.01" />
                     </div>
                     <div className="form-group">
                         <label htmlFor="location">Location</label>
@@ -162,25 +137,9 @@ const AddCustomerForm: React.FC = () => {
                             onChange={handleLocationChange}
                         />
                     </div>
-                    <div className="form-group">
-                        <label htmlFor="image">Upload Image</label>
-                        <input
-                            type="file"
-                            id="image"
-                            name="image"
-                            accept="image/*"
-                            onChange={handleImageChange}
-                        />
-                        {imagePreview && (
-                            <div className="image-preview">
-                                <img src={imagePreview} alt="Preview" />
-                            </div>
-                        )}
-                    </div>
-                    <button type="submit" className="submit-btn" disabled={isSubmitting}>
-                        {isSubmitting ? 'Submitting...' : 'Submit'}
-                    </button>
+                    <button type="submit" className="submit-btn">Submit</button>
                 </form>
+                {error && <p className="error-message">{error}</p>}
             </div>
             <div className="map-container">
                 <MapContainer
@@ -210,7 +169,6 @@ const AddCustomerForm: React.FC = () => {
                     )}
                 </MapContainer>
             </div>
-            {error && <p className="error-message">{error}</p>}
         </div>
     );
 };

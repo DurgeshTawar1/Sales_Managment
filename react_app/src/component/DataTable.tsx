@@ -1,25 +1,23 @@
 import React from 'react';
-import { DataTable } from 'primereact/datatable';
-import { Column } from 'primereact/column';
 import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 
-// Define the product data type
-interface Product {
-  code: string;
-  name: string;
-  category: string;
-  quantity: number;
-}
+// // Define the product data type
+// interface Product {
+//   code: string;
+//   name: string;
+//   category: string;
+//   quantity: number;
+// }
 
 // Sample data for the table
-const products: Product[] = [
-  { code: 'P001', name: 'Product 1', category: 'Category 1', quantity: 10 },
-  { code: 'P002', name: 'Product 2', category: 'Category 2', quantity: 20 },
-  { code: 'P003', name: 'Product 3', category: 'Category 3', quantity: 30 },
-  // Add more products as needed
-];
+// const products: Product[] = [
+//   { code: 'P001', name: 'Product 1', category: 'Category 1', quantity: 10 },
+//   { code: 'P002', name: 'Product 2', category: 'Category 2', quantity: 20 },
+//   { code: 'P003', name: 'Product 3', category: 'Category 3', quantity: 30 },
+//   // Add more products as needed
+// ];
 
 const ProductTable: React.FC = () => {
   return (

@@ -22,6 +22,12 @@ class SiteController extends Controller
         return [
             'corsFilter' => [
                 'class' => \yii\filters\Cors::class,
+                'cors' => [
+                    'Origin' => ['*'], // Allows requests from any origin
+                    'Access-Control-Request-Method' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+                    'Access-Control-Request-Headers' => ['*'],
+                    'Access-Control-Max-Age' => 86400, // Cache preflight request for 24 hours
+                ],
             ],
             'access' => [
                
@@ -58,6 +64,12 @@ class SiteController extends Controller
                 'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
             ],
         ];
+    }
+
+    public function actionReact()
+    {
+        // Ensure the path correctly points to the built React index.html file
+        return $this->renderPartial('@app/web/react/index.html');
     }
 
     /**
@@ -98,6 +110,7 @@ class SiteController extends Controller
                 'model' => $model,
                 'token' => $token,
             ]);
+          
         }
 
         return $this->render('login', [

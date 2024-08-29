@@ -1,7 +1,6 @@
 # phpstorm project files
 .idea
 
-
 # netbeans project files
 nbproject
 
@@ -15,7 +14,8 @@ Thumbs.db
 
 # composer vendor dir
 /vendor
-/node_modules
+*/node_modules
+
 # composer itself is not needed
 composer.phar
 
@@ -32,3 +32,9 @@ tests/_support/_generated
 
 #vagrant folder
 /.vagrant
+.bowerrc
+.gitignore
+LICENSE.md
+Vagrantfile
+assets/AppAsset.php
+README.md
