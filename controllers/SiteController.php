@@ -35,7 +35,12 @@ class SiteController extends Controller
                 'only' => ['logout'],
                 'rules' => [
                     [
-                        'actions' => ['logout'],
+                        'actions' => ['login' , 'signup'],
+                        'allow' => true,
+                        'roles' => ['?'],
+                    ],
+                    [
+                        'actions' => ['react'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -131,7 +136,12 @@ class SiteController extends Controller
 
     return $this->goHome();
 }
+
+ 
 }
+
+
+ 
     /**
      * Login action.
      *

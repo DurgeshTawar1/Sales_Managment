@@ -28,13 +28,13 @@ const Navbar: React.FC<NavbarProps> = () => {
 
     const handleLogout = () => {
         // Remove the token from session storage
-        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('authToken');
         // Remove the user from session storage
         sessionStorage.removeItem('user');
         // Reset the user state
         setUser(null);
         // Redirect to the logout URL
-        window.location.href = 'http://localhost:8080/site/logout';
+        window.location.href = 'http://localhost:8080/site/login';
     };
 
     return (
