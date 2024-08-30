@@ -20,6 +20,7 @@ import AddIncome from './component/AddIncome';
 import AddSupplier from './component/AddSupplier';
 import SupplierTable from './component/AllSupplier';
 import DashBoard from './component/DashBoard';
+import SalesReport from './component/Salesreport';
 
 const App: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -33,6 +34,8 @@ const App: React.FC = () => {
       <div>
         <Navbar onToggleSidebar={toggleSidebar} isSidebarOpen={sidebarOpen} />
         <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
+        
+       
         <Routes>
           <Route path="/" element={<DashBoard />} />
           <Route path="/dashboard" element={<DashBoard />} />
@@ -51,8 +54,10 @@ const App: React.FC = () => {
           <Route path="/add-income" element={<AddIncome />} />
           <Route path="/add-supplier" element={<AddSupplier />} />
           <Route path="/all-supplier" element={<SupplierTable />} />
+          <Route path="/saslesreport" element={<SalesReport />} />
         </Routes>
-      </div>
+        </div>
+      
     </Router>
   );
 };

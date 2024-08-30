@@ -5,6 +5,7 @@ const API_BASE_URL = 'http://localhost:4000/api/v1/category';
 
 // Define types for Category
 export interface Category {
+    _id:string,
     categoryname: string;
     image: string;
 }

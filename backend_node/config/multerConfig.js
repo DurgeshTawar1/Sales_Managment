@@ -15,14 +15,25 @@ if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
 }
 
+// const storage = multer.diskStorage({
+//     destination: (req, file, cb) => {
+//         cb(null, uploadDir); // Set the destination folder
+//     },
+//     filename: (req, file, cb) => {
+//         cb(null, `${Date.now()}-${file.originalname}`); // Set the filename
+//     }
+// });
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, uploadDir); // Set the destination folder
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/'); // Define your upload directory
     },
-    filename: (req, file, cb) => {
-        cb(null, `${Date.now()}-${file.originalname}`); // Set the filename
+    filename: function (req, file, cb) {
+        cb(null, file.fieldname + '-' + Date.now() + '.' + file.originalname.split('.').pop());
     }
 });
+
+const upload = multer({ storage: storage });
+
 
 const fileFilter = (req, file, cb) => {
     const fileTypes = /jpeg|jpg|png/;
@@ -36,10 +47,10 @@ const fileFilter = (req, file, cb) => {
     }
 };
 
-const upload = multer({
-    storage: storage,
-    limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
-    fileFilter: fileFilter
-});
+// const upload = multer({
+//     storage: storage,
+//     limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
+//   //  fileFilter: fileFilter
+// });
 
 export default upload;

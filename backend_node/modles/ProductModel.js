@@ -51,14 +51,14 @@ const  ProductSchema = mongoose.Schema({
         type:String,
 
     },
-    StoreDetails:{
+    // StoreDetails:{
         shortDescription:{
             type:String,
-            required:true,
+
         },
         detailDescription:{
             type:String,
-            required:true,
+            
         },
         storePrice:{
             type:Number,
@@ -68,7 +68,7 @@ const  ProductSchema = mongoose.Schema({
             type:String,
             required:true,
         }
-    }
+    
 }, {timestamps:true})
 
 const Product = mongoose.model("Product", ProductSchema);

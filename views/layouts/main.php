@@ -29,15 +29,16 @@ NavBar::begin([
     'options' => ['class' => 'navbar-expand-md navbar-dark bg-dark fixed-top']
 ]);
 
-$menuItems = [
-    ['label' => 'Home', 'url' => ['/site/index']],
-    ['label' => 'react', 'url' => ['/react']],
-];
+// $menuItems = [
+   
+// ];
 
 if (Yii::$app->user->isGuest) {
     $menuItems[] = ['label' => 'Signup', 'url' => ['/site/signup']];
     $menuItems[] = ['label' => 'Login', 'url' => ['/site/login']];
 } else {
+    $menuItems[] = ['label' => 'Home', 'url' => ['/site/index']];
+    $menuItems[] = ['label' => 'React', 'url' => ['/react']];
     $menuItems[] = '<li class="nav-item">'
         . Html::beginForm(['/site/logout'], 'post', ['class' => 'd-inline', 'id' => 'logout-form'])
         . Html::submitButton(
@@ -89,25 +90,6 @@ $(document).ready(function() {
         // Submit the form
         this.submit();
     });
-    
-    // Check if user is logged in
-    function isLoggedIn() {
-        return sessionStorage.getItem('authToken') !== null;
-    }
-    
-    // Update UI based on login status
-    function updateUI() {
-        if (isLoggedIn()) {
-            $('.navbar-nav .logout').parent().show();
-            $('.navbar-nav .login').parent().hide();
-        } else {
-            $('.navbar-nav .logout').parent().hide();
-            $('.navbar-nav .login').parent().show();
-        }
-    }
-    
-    // Initial UI update
-    updateUI();
 });
 </script>
 </body>

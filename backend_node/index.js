@@ -9,18 +9,19 @@ import expenseRoute from "./routes/expenseRoute.js";
 import incomeRoute from "./routes/incomeRoute.js";
 import supplierRoute from "./routes/supplierRoute.js";
 import purchaseRoute from "./routes/purchaseRoute.js";
+import productRoutes from "./routes/productRoute.js";
 
 dotenv.config();
 
 const app = express();
 
 // Middleware to parse JSON bodies
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(cors({
     origin: 'http://localhost:5173', 
     credentials: true,
 }));
-app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 // Use routes
 app.use("/api/v1/customer", customerRoute);
@@ -29,6 +30,7 @@ app.use("/api/v1/expense", expenseRoute);
 app.use("/api/v1/income", incomeRoute);
 app.use("/api/v1/supplier", supplierRoute);
 app.use("/api/v1/purchase", purchaseRoute);
+app.use("/api/v1/product", productRoutes);
 
 // Connect to the database
 connectToDatabase();

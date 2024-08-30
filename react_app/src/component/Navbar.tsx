@@ -34,7 +34,7 @@ const Navbar: React.FC<NavbarProps> = () => {
         // Reset the user state
         setUser(null);
         // Redirect to the logout URL
-        window.location.href = 'http://localhost:8080/site/login';
+        window.location.href = 'http://localhost:8080/site/logout';
     };
 
     return (

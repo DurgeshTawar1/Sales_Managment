@@ -15,7 +15,8 @@ import {
   FaBars,
 } from "react-icons/fa";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
-import "../styles/Sidebar.css";
+// import "../styles/Sidebar.css";
+import styled from "styled-components";
 
 interface MenuItem {
   icon: IconType;
@@ -81,7 +82,7 @@ const menuItems: MenuItem[] = [
     icon: FaChartPie,
     label: "Reports",
     subItems: [
-      { label: "Business Report", link: "/business-report" },
+      { label: "Sales Report", link: "/saslesreport" },
       { label: "Stock Report", link: "/stock-report" },
     ],
   },
@@ -92,6 +93,84 @@ interface SidebarProps {
   toggleSidebar: () => void;
 }
 
+
+
+const SidebarContainer = styled.div<{ isOpen: boolean }>`
+  width: ${props => props.isOpen ? "250px" : "60px"};
+  background-color: #2c3e50;
+  color: #ecf0f1;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  overflow-y: auto;
+  transition: all 0.3s ease;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+
+  @media (max-width: 768px) {
+    width: ${props => props.isOpen ? "200px" : "60px"};
+    transform: ${props => props.isOpen ? "translateX(0)" : "translateX(-200px)"};
+  }
+`;
+
+const SidebarHeader = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  background-color: #34495e;
+`;
+
+const SidebarToggle = styled(FaBars)`
+  font-size: 1.5rem;
+  cursor: pointer;
+  margin-right: 15px;
+  color: #ecf0f1;
+`;
+
+const SidebarHeading = styled.h1`
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin: 0;
+`;
+
+const MenuItem = styled(Link)<{ isOpen: boolean }>`
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  color: #ecf0f1;
+  text-decoration: none;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: #34495e;
+  }
+
+  svg {
+    font-size: 1.2rem;
+    margin-right: ${props => props.isOpen ? "15px" : "0"};
+  }
+
+  span {
+    display: ${props => props.isOpen ? "inline" : "none"};
+  }
+`;
+
+const SubMenu = styled.div`
+  background-color: #34495e;
+  padding-left: 20px;
+`;
+
+const SubMenuItem = styled(Link)`
+  display: block;
+  padding: 10px 15px;
+  color: #ecf0f1;
+  text-decoration: none;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: #2c3e50;
+  }
+`;
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
 
@@ -100,18 +179,15 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
   };
 
   return (
-    <div className={`sidebar ${isOpen ? "open" : "closed"}`}>
-      <div className="sidebar-header">
-        <FaBars className="sidebar-toggle" onClick={toggleSidebar} />
-        {isOpen && <h1 className="sidebar-heading">Menu</h1>}
-      </div>
+    <SidebarContainer isOpen={isOpen}>
+      <SidebarHeader>
+        <SidebarToggle onClick={toggleSidebar} />
+        {isOpen && <SidebarHeading>Menu</SidebarHeading>}
+      </SidebarHeader>
       {menuItems.map((item) => (
         <div key={item.label}>
           {item.subItems ? (
-            <div
-              className="menu-item"
-              onClick={() => toggleSubmenu(item.label)}
-            >
+            <MenuItem as="div" onClick={() => toggleSubmenu(item.label)} isOpen={isOpen}>
               <item.icon />
               {isOpen && (
                 <>
@@ -119,25 +195,25 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                   {openSubmenu === item.label ? <IoIosArrowUp /> : <IoIosArrowDown />}
                 </>
               )}
-            </div>
+            </MenuItem>
           ) : (
-            <Link to={item.link || "#"} className="menu-item">
+            <MenuItem to={item.link || "#"} isOpen={isOpen}>
               <item.icon />
               {isOpen && <span>{item.label}</span>}
-            </Link>
+            </MenuItem>
           )}
           {item.subItems && openSubmenu === item.label && isOpen && (
-            <div className="submenu">
+            <SubMenu>
               {item.subItems.map((subItem) => (
-                <Link key={subItem.label} to={subItem.link} className="submenu-item">
+                <SubMenuItem key={subItem.label} to={subItem.link}>
                   {subItem.label}
-                </Link>
+                </SubMenuItem>
               ))}
-            </div>
+            </SubMenu>
           )}
         </div>
       ))}
-    </div>
+    </SidebarContainer>
   );
 };
 

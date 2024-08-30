@@ -29,29 +29,22 @@ class SiteController extends Controller
                     'Access-Control-Max-Age' => 86400, // Cache preflight request for 24 hours
                 ],
             ],
-            'access' => [
-               
-                'class' => AccessControl::class,
-                'only' => ['logout'],
-                'rules' => [
-                    [
-                        'actions' => ['login' , 'signup'],
-                        'allow' => true,
-                        'roles' => ['?'],
-                    ],
-                    [
-                        'actions' => ['react'],
-                        'allow' => true,
-                        'roles' => ['@'],
-                    ],
+          'access' => [
+            'class' => AccessControl::class,
+            'only' => ['logout', 'react', 'index', 'login', 'signup'],
+            'rules' => [
+                [
+                    'actions' => ['login', 'signup', 'index'],
+                    'allow' => true,
+                    'roles' => ['?', '@'],
+                ],
+                [
+                    'actions' => ['logout', 'react'],
+                    'allow' => true,
+                    'roles' => ['@'],
                 ],
             ],
-            'verbs' => [
-                'class' => VerbFilter::class,
-                'actions' => [
-                    'logout' => ['post'],
-                ],
-            ],
+        ],
         ];
     }
 
@@ -73,6 +66,7 @@ class SiteController extends Controller
 
     public function actionReact()
     {
+        
         // Ensure the path correctly points to the built React index.html file
         return $this->renderPartial('@app/web/react/index.html');
     }
@@ -129,12 +123,15 @@ class SiteController extends Controller
     
     public function actionLogout()
 {
+    $model = new LoginForm();
     Yii::$app->user->logout();
 
     // Clear the session
     Yii::$app->session->destroy();
 
-    return $this->goHome();
+    return $this->render('login', [
+        'model' => $model,
+    ]);
 }
 
  

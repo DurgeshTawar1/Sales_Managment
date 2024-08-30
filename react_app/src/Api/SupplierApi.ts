@@ -5,7 +5,7 @@ const API_URL =  "http://localhost:4000/api/v1/supplier"
 
 // Define the Supplier interface (adjust fields as needed)
 export interface Supplier {
-  id: string;
+  // _id: string;
   supplierName: string;
   phone: number;
   email: string;

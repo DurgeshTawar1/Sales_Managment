@@ -1,15 +1,20 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import Barcode from 'react-barcode'; // Import Barcode component
+import React, { useEffect, useState } from 'react';
+import { createProduct } from '../Api/ProductApi';
+import { getAllCategories } from '../Api/CategoryiesApi';
+import Barcode from 'react-barcode';
 
+
+interface Category {
+    id: string;
+    categoryname: string;
+}
 const AddProduct: React.FC = () => {
-    // const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [image, setImage] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
-    const [barcode, setBarcode] = useState<string>(''); // State for barcode
-
-    // Handle image file changes
+    const [barcode, setBarcode] = useState<string>('');
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [selectedCategory, setSelectedCategory] = useState<string>('');
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0] || null;
         setImage(file);
@@ -24,38 +29,50 @@ const AddProduct: React.FC = () => {
             setImagePreview(null);
         }
     };
+    useEffect(() => {
+        // Fetch categories on component mount
+        const fetchCategories = async () => {
+            try {
+                const fetchedCategories = await getAllCategories();
+                setCategories(fetchedCategories);
+            } catch (error) {
+                console.error('Error fetching categories:', error);
+                setError('Failed to fetch categories.');
+            }
+        };
 
-    // Handle barcode input changes
+        fetchCategories();
+    }, []);
+    const handleCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedCategory(event.target.value);
+    };
     const handleBarcodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value;
-        setBarcode(value); // Update barcode value
+        setBarcode(value);
     };
 
-    // Handle form submission
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
-        // Handle form submission
         const formData = new FormData(event.currentTarget);
+
+        // Debug: Log all form data
+        for (let [key, value] of formData.entries()) {
+            console.log(`${key}: ${value}`);
+        }
+
         if (image) {
             formData.append('image', image);
         }
 
-        // Replace this URL with your API endpoint
-        axios.post('/api/products', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            }
-        })
-        .then(response => {
+        try {
+            const response = await createProduct(formData);
             console.log('Product added successfully:', response.data);
-        })
-        .catch(error => {
+        } catch (error) {
             console.error('Error adding product:', error);
-            setError('Failed to add product.'); // Update the error state
-        });
+            setError('Failed to add product.');
+        }
     };
-
     return (
         <div className="page-container">
             <div className="form-container">
@@ -63,23 +80,19 @@ const AddProduct: React.FC = () => {
                 <form className="product-form" onSubmit={handleSubmit}>
                     <div className="form-group">
                         <label htmlFor="name">Product Name</label>
-                        <input type="text" id="name" name="name" required />
+                        <input type="text" id="name" name="productName" required />
                     </div>
                     <div className="form-group">
-                        <label htmlFor="quantity">Quantity Type</label>
-                        <select id="quantity" name="quantity" required>
+                        <label htmlFor="quantityType">Quantity Type</label>
+                        <select id="quantityType" name="quantityType" required>
                             <option value="">Select</option>
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
+                            <option value="unit">Unit</option>
+                            <option value="kg">Kg</option>
                         </select>
                     </div>
                     <div className="form-group">
-                        <label htmlFor="SKU">SKU</label>
-                        <select id="sku" name="sku" required>
-                            <option value="">Select</option>
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
-                        </select>
+                        <label htmlFor="sku">SKU</label>
+                        <input type="text" id="sku" name="sku" required />
                     </div>
                     <div className="form-group">
                         <label htmlFor="barcode">Barcode</label>
@@ -88,39 +101,53 @@ const AddProduct: React.FC = () => {
                             id="barcode"
                             name="barcode"
                             value={barcode}
-                            onChange={handleBarcodeChange} // Handle barcode input
+                            onChange={handleBarcodeChange}
                             required
                         />
                     </div>
-                    {barcode && ( // Display barcode if barcode is present
-                <div className="barcode">
-                    
-                    <Barcode value={barcode} />
-                </div>
-            )}
+                    {barcode && (
+                        <div className="barcode">
+                            <Barcode value={barcode} />
+                        </div>
+                    )}
                     <div className="form-group">
-                        <label htmlFor="expiry">Product Expiry Date</label>
-                        <textarea id="expiry" name="expiry"></textarea>
+                        <label htmlFor="productExpiry">Product Expiry Date</label>
+                        <input type="date" id="productExpiry" name="productExpiry" />
                     </div>
                     <div className="form-group">
                         <label htmlFor="quantity">Quantity</label>
                         <input type="number" id="quantity" name="quantity" />
                     </div>
                     <div className="form-group">
-                        <label htmlFor="product-cost">Product Cost</label>
-                        <input type="number" id="product-cost" name="product-cost" step="0.01" />
+                        <label htmlFor="productCost">Product Cost</label>
+                        <input type="number" id="productCost" name="productCost" step="0.01" />
                     </div>
                     <div className="form-group">
-                        <label htmlFor="sell-price">Sell Price</label>
-                        <input type="number" id="sell-price" name="sell-price" step="0.01" />
+                        <label htmlFor="sellPrice">Sell Price</label>
+                        <input type="number" id="sellPrice" name="sellPrice" step="0.01" />
                     </div>
                     <div className="form-group">
+                        {/* <label htmlFor="category">Category</label> */}
+                        {/* <input type="text" id="category" name="category" /> */}
                         <label htmlFor="category">Category</label>
-                        <input type="text" id="category" name="category" />
+                        <select
+                            id="category"
+                            name="category"
+                            value={selectedCategory}
+                            onChange={handleCategoryChange}
+                            required
+                        >
+                            <option value="">Select</option>
+                            {categories.map(category => (
+                                <option key={category.id} value={category.id}>
+                                    {category.categoryname}
+                                </option>
+                            ))}
+                        </select>
                     </div>
                     <div className="form-group">
-                        <label htmlFor="limit">Product Limit</label>
-                        <input type="number" id="limit" name="limit" />
+                        <label htmlFor="productLimitNumber">Product Limit Number</label>
+                        <input type="number" id="productLimitNumber" name="productLimitNumber" />
                     </div>
                     <div className="form-group">
                         <label htmlFor="notes">Notes</label>
@@ -128,26 +155,21 @@ const AddProduct: React.FC = () => {
                     </div>
                     <h1>Store Details</h1>
                     <div className="form-group">
-                        <label htmlFor="short-description">Short Description</label>
-                        <input type="text" id="short-description" name="short-description" />
+                        <label htmlFor="shortDescription">Short Description</label>
+                        <input type="text" id="shortDescription" name="StoreDetails.shortDescription" />
                     </div>
                     <div className="form-group">
-                        <label htmlFor="detail-description">Detail Description</label>
-                        <input type="text" id="detail-description" name="detail-description" />
+                        <label htmlFor="detailDescription">Detail Description</label>
+                        <input type="text" id="detailDescription" name="StoreDetails.detailDescription" />
                     </div>
                     <div className="form-group">
-                        <label htmlFor="store-price">Store Price</label>
-                        <input type="text" id="store-price" name="store-price" />
+                        <label htmlFor="storePrice">Store Price</label>
+                        <input type="text" id="storePrice" name="StoreDetails.storePrice" />
                     </div>
                     <div className="form-group">
-                        <label htmlFor="image">Upload Image</label>
-                        <input
-                            type="file"
-                            id="image"
-                            name="image"
-                            accept="image/*"
-                            onChange={handleImageChange}
-                        />
+                    <label htmlFor="image">Upload Image</label>
+                    <input type="file" id="image" name="image" accept="imageurl/*" onChange={handleImageChange} />
+
                         {imagePreview && (
                             <div className="image-preview">
                                 <img src={imagePreview} alt="Preview" />
@@ -158,7 +180,6 @@ const AddProduct: React.FC = () => {
                 </form>
             </div>
             {error && <p className="error-message">{error}</p>}
-           
         </div>
     );
 };
