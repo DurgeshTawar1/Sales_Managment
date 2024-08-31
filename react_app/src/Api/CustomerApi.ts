@@ -3,7 +3,7 @@ import axios from 'axios';
 
 // Define the Customer type based on your Mongoose schema
 export interface Customer {
-  _id: string;
+  _id: number;
   customerName: string;
   customerContact: number;
   gender: string;

@@ -135,6 +135,7 @@ const AllCustomer: React.FC = () => {
         const fetchCustomers = async () => {
             try {
                 const data = await getAllCustomers();
+                toast.success("deleted")
                 setData(data);
                 setLoading(false);
             } catch (error) {
