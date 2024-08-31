@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, ThemeProvider, createTheme, Typography, Grid, Paper, Avatar } from "@mui/material";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { DataGrid, GridColDef, GridPaginationModel } from '@mui/x-data-grid';
@@ -7,6 +7,9 @@ import { TrendingUp, TrendingDown } from 'lucide-react';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
+import { getAllProducts } from '../Api/ProductApi';
+import { getAllExpense } from '../Api/Expense';
+import { toast } from 'react-toastify';
 
 // Define the interface for the props
 interface StatCardProps {
@@ -257,15 +260,54 @@ const SupplierSlider = () => {
 const Dashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
   // const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
- 
- 
+  const [product, setProduct] = useState<any[]>([]); // Initialize as an empty array
+  const [expense, setExpense] = useState<any[]>([]);
+
+  // const [loading, setLoading] = useState(false)
  
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
  
  console.log(toggleSidebar);
+ useEffect(() => {
+  const totalproducts = async () => {
+    try {
+      const response = await getAllProducts();
+      setProduct(response.data); // Use response.data to set the data
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    // } 
+    }
+  };
 
+  totalproducts();
+}, []);
+
+
+useEffect(() => {
+  const totalExpense = async () => {
+    try {
+      const response = await getAllExpense();
+      // console.log("res", response)
+      console.log('Expense Data:', response.data); // Check what is returned
+      if (Array.isArray(response.data)) {
+        setExpense(response.data); // Update state with fetched data
+
+      } else {
+        console.error('Expected an array but received:', response.data);
+        toast.error("error")
+      }
+
+      setExpense(response.data); // Use response.data to set the data
+    } catch (error) {
+      console.error('Error fetching Expense:', error);
+    // } 
+    }
+  };
+
+  totalExpense();
+}, []);
  
   return (
     <ThemeProvider theme={theme}>
@@ -283,10 +325,10 @@ const Dashboard = () => {
         <Box className="dashboard-content">
           <Grid container spacing={3}>
             <Grid item xs={12} sm={6} md={4} lg={2.4}>
-              <StatCard title="Total Products" value="2,500" color={theme.palette.primary.main} trend="up" />
+              <StatCard title="Total Products" value={product.length} color={theme.palette.primary.main} trend="up" />
             </Grid>
             <Grid item xs={12} sm={6} md={4} lg={2.4}>
-              <StatCard title="Total Expense" value="$15,000" color={theme.palette.secondary.main} trend="down" />
+              <StatCard title="Total Expense" value="10" color={theme.palette.secondary.main} trend="down" />
             </Grid>
             <Grid item xs={12} sm={6} md={4} lg={2.4}>
               <StatCard title="Total Customers" value="10,200" color={theme.palette.info.main} trend="up" />

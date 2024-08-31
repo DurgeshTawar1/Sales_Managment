@@ -132,7 +132,7 @@ const ActionButton = styled.button`
   }
 `;
 
-const AllProduct: React.FC = () => {
+const AddProductPopup: React.FC = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<ProductData[]>([]);
@@ -292,4 +292,4 @@ const AllProduct: React.FC = () => {
   );
 };
 
-export default AllProduct;
+export default AddProductPopup;

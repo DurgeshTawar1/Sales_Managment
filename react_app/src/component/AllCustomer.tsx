@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { getAllCustomers, Customer } from '../Api/CustomerApi'; // Make sure this path is correct
-import { deleteCustomerById } from '../Api/CustomerApi'; // Make sure this path is correct
+import { getAllCustomers, deletecustomer, CustomerFormData} from '../Api/CustomerApi'; 
 
 import { toast } from 'react-toastify';
 import DataTable from 'react-data-table-component';
@@ -124,8 +123,9 @@ const ActionButton = styled.button`
   }
 `;
 
+
 const AllCustomer: React.FC = () => {
-    const [data, setData] = useState<Customer[]>([]);
+    const [data, setData] = useState<CustomerFormData[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
 
 
@@ -135,7 +135,7 @@ const AllCustomer: React.FC = () => {
         const fetchCustomers = async () => {
             try {
                 const data = await getAllCustomers();
-                toast.success("deleted")
+                // toast.success("deleted")
                 setData(data);
                 setLoading(false);
             } catch (error) {
@@ -156,9 +156,11 @@ const AllCustomer: React.FC = () => {
 
     const handleDelete = async (id: number) => {
         try {
-            await deleteCustomerById(id.toString()); // Call delete API
+            await deletecustomer(id); // Call delete API
+            toast.success("Customer Deleted Successfulliy!")
+
             setData((prevCustomers) =>
-                prevCustomers.filter((customer) => customer.customerContact !== id)
+                prevCustomers.filter((customer) => customer.id !== id)
             ); // Remove deleted customer from state
         } catch (error) {
             toast.error('Failed to delete customer.');
@@ -172,17 +174,17 @@ const AllCustomer: React.FC = () => {
 
     
     const columns = [
-        { name: 'Supplier Name', selector: (row: Customer) => row.customerName, sortable: true },
-        { name: 'Contact No', selector: (row: Customer) => row.customerContact, sortable: true },
-        { name: 'Email', selector: (row: Customer) => row.customerEmail, sortable: true },
-        { name: 'Address', selector: (row: Customer) => row.location, sortable: true },
-        { name: 'Date Added', selector: (row: Customer) => new Date(row.createdAt).toLocaleDateString(), sortable: true },
+        { name: 'Supplier Name', selector: (row: CustomerFormData) => row.customerName, sortable: true },
+        { name: 'Contact No', selector: (row: CustomerFormData) => row.customerContact, sortable: true },
+        { name: 'Email', selector: (row: CustomerFormData) => row.customerEmail, sortable: true },
+        { name: 'Address', selector: (row: CustomerFormData) => row.location, sortable: true },
+        { name: 'Date Added', selector: (row: CustomerFormData) => new Date(row.createdAt).toLocaleDateString(), sortable: true },
         {
           name: 'Actions',
-          cell: (row: Customer) => (
+          cell: (row: CustomerFormData) => (
             <>
-              <ActionButton onClick={() => handleEdit(row._id)}><FaEdit /></ActionButton>
-              <ActionButton onClick={() => handleDelete(row._id)}><FaTrash /></ActionButton>
+              <ActionButton onClick={() => handleEdit(row.id)}><FaEdit /></ActionButton>
+              <ActionButton onClick={() => handleDelete(row.id)}><FaTrash /></ActionButton>
             </>
           ),
         },
@@ -232,7 +234,7 @@ const AllCustomer: React.FC = () => {
         <BannerSubtitle>Manage your Customers efficiently</BannerSubtitle>
       </Banner>
       <ButtonContainer>
-        <AddButton onClick={handleOpenAddCustomer}>Add Suppplier</AddButton>
+        <AddButton onClick={handleOpenAddCustomer}>Add Customer</AddButton>
       </ButtonContainer>
 
       

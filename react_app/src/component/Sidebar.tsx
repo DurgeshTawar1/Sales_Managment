@@ -83,7 +83,7 @@ const menuItems: MenuItem[] = [
     label: "Reports",
     subItems: [
       { label: "Sales Report", link: "/saslesreport" },
-      { label: "Stock Report", link: "/stock-report" },
+      // { label: "Stock Report", link: "/stock-report" },
     ],
   },
 ];
@@ -182,7 +182,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
     <SidebarContainer isOpen={isOpen}>
       <SidebarHeader>
         <SidebarToggle onClick={toggleSidebar} />
-        {isOpen && <SidebarHeading>Menu</SidebarHeading>}
+        {isOpen && <SidebarHeading>SalesZone</SidebarHeading>}
       </SidebarHeader>
       {menuItems.map((item) => (
         <div key={item.label}>

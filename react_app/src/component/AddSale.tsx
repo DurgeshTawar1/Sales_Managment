@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
+import { toast } from 'react-toastify';
 import "../styles/Sale.css";
 import CustomerSelectPopup from './pop_up/ChooseCustomer';
+import { createSale, Sale } from '../Api/SaleApi'; 
+
 interface Product {
   id: number;
   name: string;
@@ -21,10 +24,11 @@ const paymentTypes: PaymentType[] = [
   { id: 4, type: 'PayPal' }
 ];
 
+
 const AddSale: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
-   const [customer, setCustomer] = useState<string | null>(null);
-  const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [customer, setCustomer] = useState<string | null>(null);
+  // const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [discountPercent, setDiscountPercent] = useState<number>(0);
   const [discountFlat, setDiscountFlat] = useState<number>(0);
   const [taxPercent, setTaxPercent] = useState<number>(0);
@@ -35,7 +39,7 @@ const AddSale: React.FC = () => {
   const [orderNo, setOrderNo] = useState<string>('');
   const [status, setStatus] = useState<string>('Pending');
   const [paymentType, setPaymentType] = useState<number | null>(null);
-   const [image, setImage] = useState<File | null>(null);
+  const [image, setImage] = useState<File | null>(null);
   const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
 
   const handleAddProduct = () => {
@@ -55,14 +59,50 @@ const AddSale: React.FC = () => {
     setProducts(newProducts);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     console.log('Saving sale...');
     console.log('Selected Customer:', customer);
-    if (image) {
-      console.log('Selected Image:', image.name);
-     
+
+    if (!customer) {
+      toast.error('Please select a customer');
+      return;
     }
-   
+
+    try {
+      const formData = new FormData();
+      formData.append('customer', customer);
+      // Append other sale details
+      formData.append('date', new Date().toISOString().split('T')[0]);
+      formData.append('discount', discountPercent.toString());
+      formData.append('discountFlat', discountFlat.toString());
+      formData.append('tax', taxPercent.toString());
+      formData.append('taxFlat', taxFlat.toString());
+      formData.append('shipping', shipping.toString());
+      formData.append('customerPaid', customerPaid.toString());
+      formData.append('notes', notes);
+      formData.append('orderNo', orderNo);
+      formData.append('status', status);
+      formData.append('paymentType', paymentType?.toString() ?? '');
+
+      products.forEach((product) => {
+        formData.append('newProduct', product.name);
+        formData.append('qty', product.qty.toString());
+        formData.append('price', product.price.toString());
+      });
+
+      if (image) {
+        formData.append('uploadImage', image);
+      }
+
+      const result = await createSale(formData as unknown as Sale);
+      toast.success('Sale saved successfully!');
+    //  handleRute();
+      console.log('Sale created:', result);
+      // Optionally reset the form or handle after-save actions
+    } catch (error) {
+      toast.error('Error saving sale');
+      console.error('Error creating sale:', error);
+    }
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -79,21 +119,13 @@ const AddSale: React.FC = () => {
     return { subtotal, discount, tax, total };
   };
 
-   const { total } = calculateTotals();
+  const { total } = calculateTotals();
   const profit = total - customerPaid;
 
   return (
     <div className="card">
       <h2 className="heading">Add Sale</h2>
-      <div className="form-row">
-        <button className="button" onClick={() => setIsPopupOpen(true)}>Choose Customer</button>
-        <input
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          className="input"
-        />
-      </div>
+      
       <div className="form-row">
         <button className="button" onClick={handleAddProduct}>Add Product</button>
       </div>
@@ -140,12 +172,19 @@ const AddSale: React.FC = () => {
           ))}
         </tbody>
       </table>
-      {/* <div className="totals">
-        <div>Subtotal: ${subtotal.toFixed(2)}</div>
-        <div>Discount: -${discount.toFixed(2)}</div>
-        <div>Tax: +${tax.toFixed(2)}</div>
-        <div>Total: ${total.toFixed(2)}</div>
-      </div> */}
+      <div className="totals">
+        <label> Choose Customer</label>
+        <select
+          value={status}
+          onChange={(e) => setCustomer(e.target.value)}
+          className="select"
+        >
+          <option>Pending</option>
+          <option>Completed</option>
+          <option>Cancelled</option>
+        </select>
+        <label>Payment Type</label>
+      </div>
       <div className="discount-tax-shipping">
         <div>
           <label>Discount (%)</label>

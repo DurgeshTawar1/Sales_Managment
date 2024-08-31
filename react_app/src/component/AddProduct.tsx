@@ -2,12 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { createProduct } from '../Api/ProductApi';
 import { getAllCategories } from '../Api/CategoryiesApi';
 import Barcode from 'react-barcode';
-
-
+import { toast } from 'react-toastify';
+ 
 interface Category {
     id: string;
     categoryname: string;
 }
+ 
 const AddProduct: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [image, setImage] = useState<File | null>(null);
@@ -15,10 +16,11 @@ const AddProduct: React.FC = () => {
     const [barcode, setBarcode] = useState<string>('');
     const [categories, setCategories] = useState<Category[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<string>('');
+ 
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0] || null;
         setImage(file);
-
+ 
         if (file) {
             const reader = new FileReader();
             reader.onloadend = () => {
@@ -29,55 +31,79 @@ const AddProduct: React.FC = () => {
             setImagePreview(null);
         }
     };
+ 
+    // useEffect(() => {
+    //     const fetchCategories = async () => {
+    //         try {
+    //             const fetchedCategories = await getAllCategories();
+    //             // toast.success("Product Added Successfulliy")
+    //             setCategories(fetchedCategories);
+               
+    //         } catch (error) {
+    //             console.error('Error fetching categories:', error);
+    //             setError('Failed to fetch categories.');
+    //         }
+    //     };
+ 
+    //     fetchCategories();
+    // }, []);
+ 
     useEffect(() => {
-        // Fetch categories on component mount
         const fetchCategories = async () => {
             try {
                 const fetchedCategories = await getAllCategories();
+                // toast.success("Product Added Successfulliy")
                 setCategories(fetchedCategories);
+               
             } catch (error) {
                 console.error('Error fetching categories:', error);
                 setError('Failed to fetch categories.');
             }
         };
-
+ 
         fetchCategories();
     }, []);
+
+
+    
+ 
     const handleCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedCategory(event.target.value);
     };
+ 
     const handleBarcodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value;
         setBarcode(value);
     };
-
+ 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-
+ 
         const formData = new FormData(event.currentTarget);
-
-        // Debug: Log all form data
-        for (let [key, value] of formData.entries()) {
-            console.log(`${key}: ${value}`);
-        }
-
+ 
         if (image) {
-            formData.append('image', image);
+            formData.set('image', image);
         }
-
+ 
         try {
             const response = await createProduct(formData);
-            console.log('Product added successfully:', response.data);
+            // console.log('Product added successfully:', response.data);
+            // You might want to add some success feedback here
+            console.log(response);
+            toast.success("Product Successfulliy!")
+            // setCategories('');
         } catch (error) {
-            console.error('Error adding product:', error);
+            toast.error('Error adding product:');
             setError('Failed to add product.');
+            console.log(error);
         }
     };
+ 
     return (
         <div className="page-container">
             <div className="form-container">
                 <h1 className="form-heading">Add Product</h1>
-                <form className="product-form" onSubmit={handleSubmit}>
+                <form className="product-form" onSubmit={handleSubmit} encType="multipart/form-data">
                     <div className="form-group">
                         <label htmlFor="name">Product Name</label>
                         <input type="text" id="name" name="productName" required />
@@ -127,8 +153,6 @@ const AddProduct: React.FC = () => {
                         <input type="number" id="sellPrice" name="sellPrice" step="0.01" />
                     </div>
                     <div className="form-group">
-                        {/* <label htmlFor="category">Category</label> */}
-                        {/* <input type="text" id="category" name="category" /> */}
                         <label htmlFor="category">Category</label>
                         <select
                             id="category"
@@ -153,7 +177,7 @@ const AddProduct: React.FC = () => {
                         <label htmlFor="notes">Notes</label>
                         <input type="text" id="notes" name="notes" />
                     </div>
-                    <h1>Store Details</h1>
+                    <h2>Store Details</h2>
                     <div className="form-group">
                         <label htmlFor="shortDescription">Short Description</label>
                         <input type="text" id="shortDescription" name="StoreDetails.shortDescription" />
@@ -167,9 +191,8 @@ const AddProduct: React.FC = () => {
                         <input type="text" id="storePrice" name="StoreDetails.storePrice" />
                     </div>
                     <div className="form-group">
-                    <label htmlFor="image">Upload Image</label>
-                    <input type="file" id="image" name="image" accept="imageurl/*" onChange={handleImageChange} />
-
+                        <label htmlFor="image">Upload Image</label>
+                        <input type="file" id="image" name="image" accept="image/*" onChange={handleImageChange} />
                         {imagePreview && (
                             <div className="image-preview">
                                 <img src={imagePreview} alt="Preview" />
@@ -183,5 +206,5 @@ const AddProduct: React.FC = () => {
         </div>
     );
 };
-
+ 
 export default AddProduct;

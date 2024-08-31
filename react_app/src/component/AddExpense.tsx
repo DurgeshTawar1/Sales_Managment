@@ -1,23 +1,45 @@
 import React, { useState } from 'react';
 import "../styles/Expense.css";
+import { addExpense } from '../Api/Expense';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const ExpenseForm: React.FC = () => {
   const [expenseName, setExpenseName] = useState<string>('');
-  const [cost, setCost] = useState<number>(0);
+  const [cost, setCost] = useState<number | ''>(''); // Allow empty state
   const [category, setCategory] = useState<string>('');
-  const [customCategory, setCustomCategory] = useState<string>(''); // New state for custom category
+  const [customCategory, setCustomCategory] = useState<string>('');
   const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [details, setDetails] = useState<string>('');
 
-  const handleSave = () => {
-    // Implement save functionality here
-    console.log({
+  const handleSave = async () => {
+    if (expenseName.trim() === '' || cost === '' || cost <= 0 || (category === '' && customCategory.trim() === '')) {
+      toast.error('Please fill out all required fields correctly.');
+      return;
+    }
+
+    const expenseData = {
       expenseName,
-      cost,
-      category: category || customCategory, // Use custom category if category is not selected
+      cost: Number(cost),
+      category: category || customCategory,
       date,
-      details,
-    });
+      typeCategory: category || customCategory,
+      expenseDetails: details,
+    };
+
+    try {
+      await addExpense(expenseData);
+      toast.success('Expense added successfully!');
+      // Clear form fields after successful addition
+      setExpenseName('');
+      setCost('');
+      setCategory('');
+      setCustomCategory('');
+      setDate(new Date().toISOString().split('T')[0]);
+      setDetails('');
+    } catch (error) {
+      toast.error('Failed to add expense. Please try again.');
+    }
   };
 
   return (
@@ -41,8 +63,8 @@ const ExpenseForm: React.FC = () => {
             <input
               type="number"
               id="cost"
-              value={cost}
-              onChange={(e) => setCost(Number(e.target.value))}
+              value={cost === '' ? '' : cost} // Handle empty state
+              onChange={(e) => setCost(e.target.value ? Number(e.target.value) : '')}
               className="form-input"
               placeholder="Enter cost"
             />
@@ -100,6 +122,7 @@ const ExpenseForm: React.FC = () => {
         </div>
         <button className="save-button" onClick={handleSave}>Save</button>
       </div>
+      <ToastContainer /> 
     </div>
   );
 };

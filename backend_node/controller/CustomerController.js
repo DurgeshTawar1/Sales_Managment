@@ -16,6 +16,7 @@ export const createCustomer = async (req, res) => {
 export const getAllCustomers = async (req, res) => {
   try {
     const customers = await Customer.find();
+    console.log(customers);
     res.status(200).json({ message: 'Customers retrieved successfully', data: customers });
   } catch (error) {
     res.status(500).json({ message: 'Error retrieving customers', error: error.message });

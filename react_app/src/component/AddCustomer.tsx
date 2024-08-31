@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import { Icon } from 'leaflet';
@@ -6,12 +7,22 @@ import { debounce } from 'lodash';
 import 'leaflet/dist/leaflet.css';
 import "../styles/AddCustomer.css";
 import { toast } from 'react-toastify';
-import { createCustomer } from '../Api/CustomerApi';
+import { createCustomer, CustomerFormData } from '../Api/CustomerApi';
 
 const AddCustomerForm: React.FC = () => {
     const [location, setLocation] = useState<string>('');
     const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [formData, setFormData] = useState<CustomerFormData>({
+        customerName: '',
+        customerContact: '',
+        gender: '',
+        customerEmail: '',
+        notes: '',
+        AdvancedPaid: '',
+        discountRate: '',
+        location: '',
+    });
 
     const debouncedHandleLocationChange = debounce(async (location: string) => {
         setError(null);
@@ -45,38 +56,41 @@ const AddCustomerForm: React.FC = () => {
         }
     }, 300);
 
-    const handleLocationChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const location = event.target.value;
-        setLocation(location);
-        debouncedHandleLocationChange(location);
+    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+        const { name, value } = event.target;
+        setFormData(prevData => ({
+            ...prevData,
+            [name]: value
+        }));
     };
-    
+
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         
-        const form = event.currentTarget;
-        const formData = new FormData(form);
-    
-        // Create a FormData object and append each field
-        const customerFormData = new FormData();
-    
-        // Iterate over the FormData entries and append them to customerFormData
-        formData.forEach((value, key) => {
-            customerFormData.append(key, value);
-        });
-    
         try {
-            const response = await createCustomer(customerFormData);
+            const response = await createCustomer(formData);
             console.log(response);
             
             toast.success('Customer added successfully!');
+            // Reset form after successful submission
+            setFormData({
+                customerName: '',
+                customerContact: '',
+                gender: '',
+                customerEmail: '',
+                notes: '',
+                AdvancedPaid: '',
+                discountRate: '',
+                location: '',
+            });
+            setLocation('');
+            setCoords(null);
         } catch (error) {
             toast.error('Failed to add customer. Please try again.');
             console.error('Error adding customer:', error);
             setError('Failed to add customer. Please try again.');
         }
     }
-    
 
     const MapComponent = () => {
         const map = useMap();
@@ -96,36 +110,82 @@ const AddCustomerForm: React.FC = () => {
                 <h1 className="form-heading">Add Customer</h1>
                 <form className="customer-form" onSubmit={handleSubmit}>
                     <div className="form-group">
-                        <label htmlFor="name">Customer Name</label>
-                        <input type="text" id="name" name="customerName" required />
+                        <label htmlFor="customerName">Customer Name</label>
+                        <input 
+                            type="text" 
+                            id="customerName" 
+                            name="customerName" 
+                            value={formData.customerName}
+                            onChange={handleInputChange}
+                            required 
+                        />
                     </div>
                     <div className="form-group">
-                        <label htmlFor="contact">Customer Contact</label>
-                        <input type="number" id="contact" name="customerContact" required />
+                        <label htmlFor="customerContact">Customer Contact</label>
+                        <input 
+                            type="tel" 
+                            id="customerContact" 
+                            name="customerContact" 
+                            value={formData.customerContact}
+                            onChange={handleInputChange}
+                            required 
+                        />
                     </div>
                     <div className="form-group">
                         <label htmlFor="gender">Gender</label>
-                        <select id="gender" name="gender" required>
+                        <select 
+                            id="gender" 
+                            name="gender" 
+                            value={formData.gender}
+                            onChange={handleInputChange}
+                            required
+                        >
                             <option value="">Select</option>
                             <option value="male">Male</option>
                             <option value="female">Female</option>
                         </select>
                     </div>
                     <div className="form-group">
-                        <label htmlFor="email">Customer Email</label>
-                        <input type="email" id="email" name="customerEmail" required />
+                        <label htmlFor="customerEmail">Customer Email</label>
+                        <input 
+                            type="email" 
+                            id="customerEmail" 
+                            name="customerEmail" 
+                            value={formData.customerEmail}
+                            onChange={handleInputChange}
+                            required 
+                        />
                     </div>
                     <div className="form-group">
                         <label htmlFor="notes">Notes</label>
-                        <textarea id="notes" name="notes"></textarea>
+                        <textarea 
+                            id="notes" 
+                            name="notes"
+                            value={formData.notes}
+                            onChange={handleInputChange}
+                        ></textarea>
                     </div>
                     <div className="form-group">
-                        <label htmlFor="advanced-paid">Advanced Paid</label>
-                        <input type="number" id="advanced-paid" name="AdvancedPaid" step="0.01" />
+                        <label htmlFor="AdvancedPaid">Advanced Paid</label>
+                        <input 
+                            type="number" 
+                            id="AdvancedPaid" 
+                            name="AdvancedPaid" 
+                            value={formData.AdvancedPaid}
+                            onChange={handleInputChange}
+                            step="0.01" 
+                        />
                     </div>
                     <div className="form-group">
-                        <label htmlFor="discount-rate">Discount Rate</label>
-                        <input type="number" id="discount-rate" name="discountRate" step="0.01" />
+                        <label htmlFor="discountRate">Discount Rate</label>
+                        <input 
+                            type="number" 
+                            id="discountRate" 
+                            name="discountRate" 
+                            value={formData.discountRate}
+                            onChange={handleInputChange}
+                            step="0.01" 
+                        />
                     </div>
                     <div className="form-group">
                         <label htmlFor="location">Location</label>
@@ -133,8 +193,12 @@ const AddCustomerForm: React.FC = () => {
                             type="text"
                             id="location"
                             name="location"
-                            value={location}
-                            onChange={handleLocationChange}
+                            value={formData.location}
+                            onChange={(e) => {
+                                handleInputChange(e);
+                                setLocation(e.target.value);
+                                debouncedHandleLocationChange(e.target.value);
+                            }}
                         />
                     </div>
                     <button type="submit" className="submit-btn">Submit</button>

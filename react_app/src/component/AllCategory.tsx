@@ -1,175 +1,151 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { 
-  Box, 
-  Typography, 
-  Button, 
-  TextField, 
-  Paper, 
-  Chip,
-  Avatar,
-  IconButton,
-  Tooltip,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Snackbar,
-  CircularProgress,
-  Container
-} from '@mui/material';
-import { 
-  DataGrid, 
-  GridColDef, 
-  GridRenderCellParams,
-  GridToolbar,
-//   GridValueGetterParams
-} from '@mui/x-data-grid';
-import { 
-  Add as AddIcon,
-  Edit as EditIcon,
-  Delete as DeleteIcon,
-  Search as SearchIcon,
-  Refresh as RefreshIcon,
-  Category as CategoryIcon
-} from '@mui/icons-material';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { getAllCategories, deleteCategory } from '../Api/CategoryiesApi';
+import { getAllCategories, deleteCategory, Category } from '../Api/CategoryiesApi';
+import { FaEdit, FaTrash } from 'react-icons/fa';
+import DataTable from 'react-data-table-component';
+import { toast } from 'react-toastify';
 
-// Define the Category interface
-interface Category {
-  _id: string;
-  categoryname: string;
-  image: string;
-  __v: number;
-}
-
-// Create a custom theme
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#3f51b5',
-    },
-    secondary: {
-      main: '#f50057',
-    },
-    background: {
-      default: '#f5f5f5',
-    },
-  },
-  typography: {
-    fontFamily: '"Poppins", "Roboto", "Helvetica", "Arial", sans-serif',
-    h1: {
-      fontSize: '2.5rem',
-      fontWeight: 600,
-    },
-    h2: {
-      fontSize: '2rem',
-      fontWeight: 500,
-    },
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-          textTransform: 'none',
-          fontWeight: 600,
-        },
-      },
-    },
-    MuiChip: {
-      styleOverrides: {
-        root: {
-          borderRadius: 6,
-        },
-      },
-    },
-  },
-});
-
-// Styled components
-const PageContainer = styled(Container)`
-  padding-top: 40px;
-  padding-bottom: 40px;
+// // Define the Category interface
+// interface Category {
+//   id: number;
+//   categoryname: string;
+//   image: string;
+//   __v: number;
+// }
+const Container = styled.div`
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Arial', sans-serif;
+  margin-left: 240px;
 `;
 
-const BannerPaper = styled(Paper)`
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+const Banner = styled.div`
+  background: linear-gradient(135deg, #9673db 0%, #2981b9 100%);
   color: white;
   padding: 40px;
-  border-radius: 16px;
-  margin-top:-100px
-  margin-bottom: 32px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 `;
 
-const ContentPaper = styled(Paper)`
-  padding: 32px;
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+const BannerTitle = styled.h1`
+  font-size: 2.5rem;
+  margin: 0;
+  margin-bottom: 10px;
 `;
 
-const Header = styled(Box)`
+const BannerSubtitle = styled.p`
+  font-size: 1.2rem;
+  margin: 0;
+  opacity: 0.8;
+`;
+
+const ButtonContainer = styled.div`
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 32px;
-  margin-top:-3px;
+  justify-content: flex-end;
+  margin-bottom: 20px;
 `;
 
-const SearchBox = styled(Box)`
-  display: flex;
-  align-items: center;
-  background-color: #fff;
-  border-radius: 25px;
-  padding: 6px 16px;
-  width: 300px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-`;
-
-const StyledDataGrid = styled(DataGrid)`
+const AddButton = styled.button`
+  background-color: #2ecc71;
+  color: white;
   border: none;
-  width:1000px;
-  display:flex
-  margin-left:1 00px
-  .MuiDataGrid-columnHeaders {
-    background-color: ${theme.palette.primary.main};
-    color: #fff;
-  }
-  .MuiDataGrid-cell {
-    border-bottom: 1px solid #f0f0f0;
-  }
-  .MuiDataGrid-row:nth-of-type(even) {
-    background-color: #fafafa;
-  }
-  .MuiDataGrid-row:hover {
-    background-color: #f0f7ff;
-  }
-`;
-
-const ImageCell = styled(Avatar)`
-  width: 40px;
-  height: 40px;
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 6px;
   cursor: pointer;
-  transition: transform 0.3s ease;
+  transition: background-color 0.3s ease;
 
   &:hover {
-    transform: scale(1.2);
+    background-color: #27ae60;
   }
 `;
+
+const Alert = styled.div`
+  background-color: green;
+  color: white;
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+`;
+
+const AlertIcon = styled.span`
+  font-size: 1.5rem;
+  margin-right: 10px;
+`;
+
+const AlertContent = styled.div`
+  flex: 1;
+`;
+
+const AlertTitle = styled.h3`
+  margin: 0;
+  font-size: 1.1rem;
+  margin-bottom: 5px;
+`;
+
+const AlertDescription = styled.p`
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.9;
+`;
+
+const LoaderWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+`;
+
+const Loader = styled.div`
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+`;
+
+const ActionButton = styled.button`
+  border: none;
+  cursor: pointer;
+  margin: 0 5px;
+  font-size: 1rem;
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: #3498db;
+  }
+`;
+
+// const ImageCell = styled(Avatar)`
+//   width: 40px;
+//   height: 40px;
+//   cursor: pointer;
+//   transition: transform 0.3s ease;
+
+//   &:hover {
+//     transform: scale(1.2);
+//   }
+// `;
 
 const AllcategoryTable: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-
+  
+  // const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
+  
   const navigate = useNavigate();
 
   const fetchCategories = async () => {
@@ -178,12 +154,13 @@ const AllcategoryTable: React.FC = () => {
       const data = await getAllCategories();
       if (Array.isArray(data) && data.every(item => item && item._id)) {
         setCategories(data);
+        // toast.success("Category fetched")
       } else {
         throw new Error('Invalid data format');
       }
       setLoading(false);
     } catch (error) {
-      setError('Failed to load categories.');
+      toast.error('Failed to load categories.');
       setLoading(false);
       console.error('Error fetching categories:', error);
     }
@@ -194,198 +171,134 @@ const AllcategoryTable: React.FC = () => {
     fetchCategories();
   }, []);
 
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value);
+  
+  const handleEdit = (_id: number) => {
+    navigate(`/edit-category/${_id}`);
   };
 
-  const handleEdit = (id: string) => {
-    navigate(`/edit-category/${id}`);
-  };
+ 
 
-  const handleDeleteConfirmation = (id: string) => {
-    setCategoryToDelete(id);
-    setDeleteDialogOpen(true);
-  };
-
-  const handleDeleteCategory = async () => {
-    if (categoryToDelete) {
+  const handleDeleteCategory = async (_id: number) => {
+  
       try {
-        await deleteCategory(categoryToDelete);
+        await deleteCategory(_id);
         setCategories((prevCategories) =>
-          prevCategories.filter((category) => category._id !== categoryToDelete)
+          prevCategories.filter((category) => category._id !== _id)
         );
-        setSnackbarMessage('Category deleted successfully');
-        setSnackbarOpen(true);
+       
       } catch (error) {
-        setSnackbarMessage('Failed to delete category');
-        setSnackbarOpen(true);
+      
         console.error('Error deleting category:', error);
       }
-    }
-    setDeleteDialogOpen(false);
-    setCategoryToDelete(null);
+    
   };
 
   const handleOpenAddCategory = () => {
     navigate('/add-category');
   };
 
-  const columns: GridColDef[] = [
-    { 
-        field: '_id', 
-        headerName: 'ID', 
-        width: 220,
-        valueGetter: (params: GridValueGetterParams) => params.row ? params.row._id : 'N/A'
-      },
-    { 
-      field: 'image', 
-      headerName: 'Image', 
-      width: 80,
-      renderCell: (params: GridRenderCellParams) => (
-        <ImageCell src={params.value} alt="Category" />
-      ),
-    },
-    { 
-      field: 'categoryname', 
-      headerName: 'Category Name', 
-      flex: 1,
-      renderCell: (params: GridRenderCellParams) => (
-        <Typography fontWeight={500}>{params.value}</Typography>
-      ),
-    },
+  const columns = [
+    { name: 'Supplier Name', selector: (row: Category) => row.categoryname, sortable: true },
     {
-      field: 'actions',
-      headerName: 'Actions',
-      width: 120,
-      renderCell: (params: GridRenderCellParams) => (
-        <Box>
-          <Tooltip title="Edit">
-            <IconButton onClick={() => handleEdit(params.row._id)} color="primary" size="small">
-              <EditIcon />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Delete">
-            <IconButton onClick={() => handleDeleteConfirmation(params.row._id)} color="secondary" size="small">
-              <DeleteIcon />
-            </IconButton>
-          </Tooltip>
-        </Box>
+      name: 'Image',
+      cell: (row: Category) => (
+        <img
+          src={row.image}
+          alt={row.categoryname}
+          style={{ width: '50px', height: '50px', objectFit: 'cover' }} // Adjust styles as needed
+        />
+      ),
+      sortable: false, 
+    },
+    { name: 'Date Added', selector: (row: Category) => new Date(row.createdAt).toLocaleDateString(), sortable: true },
+    {
+      name: 'Actions',
+      cell: (row: Category) => (
+        <>
+          <ActionButton onClick={() => handleEdit(row._id)}><FaEdit /></ActionButton>
+          <ActionButton onClick={() => handleDeleteCategory(row._id)}><FaTrash /></ActionButton>
+        </>
       ),
     },
   ];
 
-  const filteredCategories = categories.filter((category) =>
-    category.categoryname.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+     const customStyles = {
+    headRow: {
+      style: {
+        backgroundColor: '#f1f8ff',
+        borderBottomWidth: '2px',
+        borderBottomColor: '#d1e8ff',
+        fontWeight: 'bold',
+      },
+    },
+    headCells: {
+      style: {
+        color: '#2c3e50',
+        fontSize: '1rem',
+        padding: '16px',
+      },
+    },
+    rows: {
+      style: {
+        backgroundColor: '#ffffff',
+        '&:nth-of-type(even)': {
+          backgroundColor: '#f9f9f9',
+        },
+        '&:hover': {
+          backgroundColor: '#e8f4ff',
+          transition: 'background-color 0.3s ease',
+        },
+      },
+    },
+    cells: {
+      style: {
+        color: '#34495e',
+        fontSize: '0.9rem',
+        padding: '16px',
+      },
+    },
+  };
 
   return (
-    <ThemeProvider theme={theme}>
-      <PageContainer maxWidth="lg">
-        <BannerPaper elevation={0}>
-          <Box display="flex" alignItems="center" mb={2}>
-            <CategoryIcon fontSize="large" style={{ marginRight: '16px' }} />
-            <Typography variant="h1" component="h1">
-              Category Management
-            </Typography>
-          </Box>
-          <Typography variant="h6" style={{ opacity: 0.8 }}>
-            Organize and control your product categories with ease
-          </Typography>
-        </BannerPaper>
 
-        <ContentPaper elevation={0}>
-          <Header>
-            <Box>
-              <Typography variant="h2" component="h2" gutterBottom>
-                Categories
-              </Typography>
-              <Typography variant="body1" color="textSecondary">
-                {categories.length} categories found
-              </Typography>
-            </Box>
-            <Box display="flex" gap={2}>
-              <Button
-                variant="contained"
-                color="primary"
-                startIcon={<AddIcon />}
-                onClick={handleOpenAddCategory}
-              >
-                Add Category
-              </Button>
-              <Button
-                variant="outlined"
-                color="primary"
-                startIcon={<RefreshIcon />}
-                onClick={fetchCategories}
-              >
-                Refresh
-              </Button>
-            </Box>
-          </Header>
-          
-          <SearchBox mb={4}>
-            <SearchIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} />
-            <TextField
-              variant="standard"
-              placeholder="Search categories..."
-              value={searchTerm}
-              onChange={handleSearch}
-              InputProps={{ disableUnderline: true }}
-              fullWidth
-            />
-          </SearchBox>
-          
-          {loading ? (
-            <Box display="flex" justifyContent="center" alignItems="center" height={400}>
-              <CircularProgress />
-            </Box>
-          ) : error ? (
-            <Typography color="error">{error}</Typography>
-          ) : (
-            <StyledDataGrid
-              rows={filteredCategories}
-              columns={columns}
-              autoHeight
-              disableRowSelectionOnClick
-              initialState={{
-                pagination: {
-                  paginationModel: { pageSize: 10, page: 0 },
-                },
-              }}
-              pageSizeOptions={[5, 10, 25]}
-              getRowId={(row) => row._id}
-              components={{
-                Toolbar: GridToolbar,
-              }}
-              componentsProps={{
-                toolbar: {
-                  showQuickFilter: true,
-                  quickFilterProps: { debounceMs: 500 },
-                },
-              }}
-            />
-          )}
-        </ContentPaper>
+    <Container>
+    <Banner>
+      <BannerTitle>Our Category</BannerTitle>
+      <BannerSubtitle>Manage your Category efficiently</BannerSubtitle>
+    </Banner>
+    <ButtonContainer>
+      <AddButton onClick={handleOpenAddCategory}>Add Suppplier</AddButton>
+    </ButtonContainer>
 
-        <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-          <DialogTitle>Confirm Deletion</DialogTitle>
-          <DialogContent>
-            Are you sure you want to delete this category? This action cannot be undone.
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleDeleteCategory} color="secondary">Delete</Button>
-          </DialogActions>
-        </Dialog>
+    <Alert>
+        <AlertIcon>⚠️</AlertIcon>
+        <AlertContent>
+          <AlertTitle>Customer Update</AlertTitle>
+          <AlertDescription>
+            New Customer have been added to the inventory. Please review and update stock levels as needed.
+          </AlertDescription>
+        </AlertContent>
+      </Alert>
+      {loading ? (
+        <LoaderWrapper>
+          <Loader />
+        </LoaderWrapper>
 
-        <Snackbar
-          open={snackbarOpen}
-          autoHideDuration={6000}
-          onClose={() => setSnackbarOpen(false)}
-          message={snackbarMessage}
-        />
-      </PageContainer>
-    </ThemeProvider>
+) : (
+  <DataTable
+    columns={columns}
+    data={categories}
+    pagination
+    paginationPerPage={5}
+    paginationRowsPerPageOptions={[5, 10, 15]}
+    highlightOnHover
+    responsive
+    customStyles={customStyles}
+  />
+)}
+</Container>
+
+    
   );
 };
 

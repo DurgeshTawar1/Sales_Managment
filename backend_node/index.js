@@ -10,6 +10,7 @@ import incomeRoute from "./routes/incomeRoute.js";
 import supplierRoute from "./routes/supplierRoute.js";
 import purchaseRoute from "./routes/purchaseRoute.js";
 import productRoutes from "./routes/productRoute.js";
+import Salerouter from "./routes/salesRoute.js";
 
 dotenv.config();
 
@@ -31,6 +32,7 @@ app.use("/api/v1/income", incomeRoute);
 app.use("/api/v1/supplier", supplierRoute);
 app.use("/api/v1/purchase", purchaseRoute);
 app.use("/api/v1/product", productRoutes);
+app.use("/api/v1/sale", Salerouter);
 
 // Connect to the database
 connectToDatabase();

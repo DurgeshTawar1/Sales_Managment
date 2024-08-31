@@ -21,7 +21,7 @@ export const createProduct = async (formData: FormData) => {
 export const getAllProducts = async () => {
     try {
         const response = await axios.get(`${API_URL}/getallproduct`);
-       console.log(response.data);
+       console.log("product",response.data);
         return response.data;
         
     } catch (error) {

@@ -1,23 +1,59 @@
 import React, { useState } from 'react';
-import "../styles/Expense.css";
+import { addIncome } from '../Api/IncomeApi';
+import '../styles/Expense.css';
+import { toast } from 'react-toastify';
+
+// Define the type for income data
+interface Income {
+  incomeName: string;
+  amount: number;
+  incomeSource: string;
+  date: string;
+  typeIncomeSource: string;
+  incomeDetails?: string;
+}
 
 const AddIncome: React.FC = () => {
-  const [expenseName, setExpenseName] = useState<string>('');
-  const [cost, setCost] = useState<number>(0);
-  const [category, setCategory] = useState<string>('');
-  const [customCategory, setCustomCategory] = useState<string>(''); // New state for custom category
+  const [incomeName, setIncomeName] = useState<string>('');
+  const [amount, setAmount] = useState<number | ''>(''); // Handle initial state as empty
+  const [incomeSource, setIncomeSource] = useState<string>('');
+  const [customIncomeSource, setCustomIncomeSource] = useState<string>(''); 
   const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0]);
-  const [details, setDetails] = useState<string>('');
+  const [incomeDetails, setIncomeDetails] = useState<string>('');
+  const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  
+  const handleSave = async () => {
+    // Handle empty or invalid amount cases
+    if (amount === '' || amount <= 0) {
+      setError('Please enter a valid amount.');
+      return;
+    }
 
-  const handleSave = () => {
-    // Implement save functionality here
-    console.log({
-      expenseName,
-      cost,
-      category: category || customCategory, // Use custom category if category is not selected
+    const incomeData: Income = {
+      incomeName,
+      amount: Number(amount), // Ensure amount is a number
+      incomeSource: incomeSource || customIncomeSource,
       date,
-      details,
-    });
+      typeIncomeSource: incomeSource || customIncomeSource,
+      incomeDetails
+    };
+
+    try {
+      await addIncome(incomeData);
+      toast.success("Income added successfully")
+      setSuccessMessage('Income added successfully!');
+      setIncomeName("");
+      setAmount("");
+      setIncomeSource("");
+      setDate("");
+      setIncomeDetails("");
+      setIncomeDetails("");
+      setError(null);
+    } catch (err) {
+      toast.error('Failed to add income. Please try again.');
+      setSuccessMessage(null);
+    }
   };
 
   return (
@@ -26,35 +62,35 @@ const AddIncome: React.FC = () => {
       <div className="form-container">
         <div className="form-row">
           <div className="form-group">
-            <label htmlFor="expenseName" className="form-label">Income Name</label>
+            <label htmlFor="incomeName" className="form-label">Income Name</label>
             <input
               type="text"
-              id="expenseName"
-              value={expenseName}
-              onChange={(e) => setExpenseName(e.target.value)}
+              id="incomeName"
+              value={incomeName}
+              onChange={(e) => setIncomeName(e.target.value)}
               className="form-input"
-              placeholder="Enter expense name"
+              placeholder="Enter income name"
             />
           </div>
           <div className="form-group">
-            <label htmlFor="cost" className="form-label">Amount</label>
+            <label htmlFor="amount" className="form-label">Amount</label>
             <input
               type="number"
-              id="cost"
-              value={cost}
-              onChange={(e) => setCost(Number(e.target.value))}
+              id="amount"
+              value={amount === '' ? '' : amount} // Handle empty state
+              onChange={(e) => setAmount(e.target.value ? Number(e.target.value) : '')}
               className="form-input"
-              placeholder="Enter cost"
+              placeholder="Enter amount"
             />
           </div>
         </div>
         <div className="form-row">
           <div className="form-group">
-            <label htmlFor="category" className="form-label">Income Source</label>
+            <label htmlFor="incomeSource" className="form-label">Income Source</label>
             <select
-              id="category"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
+              id="incomeSource"
+              value={incomeSource}
+              onChange={(e) => setIncomeSource(e.target.value)}
               className="form-input"
             >
               <option value="">Select Income Source</option>
@@ -75,31 +111,30 @@ const AddIncome: React.FC = () => {
             />
           </div>
           <div className="form-group">
-            <label htmlFor="customCategory" className="form-label">Type your Income Source</label>
+            <label htmlFor="customIncomeSource" className="form-label">Type your Income Source</label>
             <input
               type="text"
-              id="customCategory"
-              value={customCategory}
-              onChange={(e) => setCustomCategory(e.target.value)}
+              id="customIncomeSource"
+              value={customIncomeSource}
+              onChange={(e) => setCustomIncomeSource(e.target.value)}
               className="form-input"
-              placeholder="Type custom category"
+              placeholder="Type custom income source"
             />
           </div>
         </div>
-        <div className="form-row">
-        
-        </div>
         <div className="form-group">
-          <label htmlFor="details" className="form-label">Income Details</label>
+          <label htmlFor="incomeDetails" className="form-label">Income Details</label>
           <textarea
-            id="details"
-            value={details}
-            onChange={(e) => setDetails(e.target.value)}
+            id="incomeDetails"
+            value={incomeDetails}
+            onChange={(e) => setIncomeDetails(e.target.value)}
             className="form-input"
-            placeholder="Enter details about the expense"
+            placeholder="Enter details about the income"
           />
         </div>
         <button className="save-button" onClick={handleSave}>Save</button>
+        {error && <p className="error-message">{error}</p>}
+        {successMessage && <p className="success-message">{successMessage}</p>}
       </div>
     </div>
   );
