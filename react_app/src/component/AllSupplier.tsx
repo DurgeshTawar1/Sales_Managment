@@ -191,7 +191,7 @@ const SupplierTable: React.FC = () => {
     //   sortable: true,
     //   format: (row: Supplier) => row.sellPrice !== undefined ? `$${row.sellPrice.toFixed(2)}` : '$0.00'
     // },
-    { name: 'Date Added', selector: (row: Supplier) => new Date(row.createdAt).toLocaleDateString(), sortable: true },
+    // { name: 'Date Added', selector: (row: Supplier) => new Date(row.createdAt).toLocaleDateString(), sortable: true },
     {
       name: 'Actions',
       cell: (row: Supplier) => (

@@ -17,9 +17,10 @@ $this->title = 'Login';
 <?php if (isset($token)): ?>
 <script>
     // Store token in sessionStorage
-    sessionStorage.setItem('authToken', <?= json_encode($token) ?>);
+    localStorage.setItem('authToken', <?= json_encode($token) ?>);
    
     // Redirect to index view
     window.location.href = '<?= \yii\helpers\Url::to(['site/index']) ?>';
+   
 </script>
 <?php endif; ?>

@@ -24,14 +24,12 @@ $this->registerMetaTag(['name' => 'viewport', 'content' => 'width=device-width, 
 <header id="header">
 <?php
 NavBar::begin([
-    'brandLabel' => Yii::$app->name,
+    'brandLabel' =>"SalesZone",
     'brandUrl' => Yii::$app->homeUrl,
     'options' => ['class' => 'navbar-expand-md navbar-dark bg-dark fixed-top']
 ]);
 
-// $menuItems = [
-   
-// ];
+$menuItems = [];
 
 if (Yii::$app->user->isGuest) {
     $menuItems[] = ['label' => 'Signup', 'url' => ['/site/signup']];
@@ -82,12 +80,8 @@ NavBar::end();
 $(document).ready(function() {
     // Handle logout
     $('#logout-form').on('submit', function(e) {
-        e.preventDefault();
-        
-        // Remove token from sessionStorage
-        sessionStorage.removeItem('authToken');
-        
-        // Submit the form
+        // Remove token from localStorage
+        localStorage.removeItem('authToken'); 
         this.submit();
     });
 });

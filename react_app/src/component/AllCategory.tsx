@@ -172,13 +172,13 @@ const AllcategoryTable: React.FC = () => {
   }, []);
 
   
-  const handleEdit = (_id: number) => {
+  const handleEdit = (_id: string) => {
     navigate(`/edit-category/${_id}`);
   };
 
  
 
-  const handleDeleteCategory = async (_id: number) => {
+  const handleDeleteCategory = async (_id: string) => {
   
       try {
         await deleteCategory(_id);
@@ -210,7 +210,7 @@ const AllcategoryTable: React.FC = () => {
       ),
       sortable: false, 
     },
-    { name: 'Date Added', selector: (row: Category) => new Date(row.createdAt).toLocaleDateString(), sortable: true },
+    // { name: 'Date Added', selector: (row: Category) => new Date(row.createdAt).toLocaleDateString(), sortable: true },
     {
       name: 'Actions',
       cell: (row: Category) => (

@@ -66,9 +66,13 @@ const KPIValue = styled.div`
   font-weight: bold;
 `;
 
-const TrendIndicator = styled.p`
+interface TrendIndicatorProps {
+  trend: number;
+}
+
+const TrendIndicator = styled.p<TrendIndicatorProps>`
   font-size: 0.75rem;
-  color: ${props => props.trend > 0 ? colors.tertiary : colors.secondary};
+  color: ${({ trend }) => (trend > 0 ? colors.tertiary : colors.secondary)};
   display: flex;
   align-items: center;
 `;
@@ -98,12 +102,23 @@ const DownloadButton = styled.button`
   }
 `;
 
-const RadialChart = ({ data, totalSales }) => {
+interface Slice {
+  name: string;
+  percent: number;
+  color: string;
+}
+
+interface RadialChartProps {
+  data: Slice[];
+  totalSales: string;
+}
+
+const RadialChart: React.FC<RadialChartProps> = ({ data, totalSales }) => {
   const centerX = 300;
   const centerY = 300;
   const radius = 250;
 
-  const getCoordinatesForPercent = (percent) => {
+  const getCoordinatesForPercent = (percent: number): [number, number] => {
     const x = centerX + radius * Math.cos(2 * Math.PI * percent);
     const y = centerY + radius * Math.sin(2 * Math.PI * percent);
     return [x, y];
@@ -150,15 +165,22 @@ const RadialChart = ({ data, totalSales }) => {
   );
 };
 
-const SalesReport = () => {
-  const [kpis, setKpis] = useState({
+interface KPIs {
+  totalSales: number;
+  averageDealSize: number;
+  conversionRate: number;
+  revenueGrowth: number;
+}
+
+const SalesReport: React.FC = () => {
+  const [kpis, setKpis] = useState<KPIs>({
     totalSales: 0,
     averageDealSize: 0,
     conversionRate: 0,
-    revenueGrowth: 0
+    revenueGrowth: 0,
   });
 
-  const [salesData, setSalesData] = useState([]);
+  const [salesData, setSalesData] = useState<Slice[]>([]);
 
   useEffect(() => {
     // Simulate API call to fetch KPI data
@@ -167,7 +189,7 @@ const SalesReport = () => {
         totalSales: 1234567,
         averageDealSize: 5432,
         conversionRate: 27.5,
-        revenueGrowth: 15.3
+        revenueGrowth: 15.3,
       });
 
       setSalesData([
@@ -179,26 +201,33 @@ const SalesReport = () => {
     }, 1000);
   }, []);
 
-  const formatCurrency = (value) => {
+  const formatCurrency = (value: number): string => {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
   };
 
-  const KPICard = ({ title, value, icon, trend }) => (
-    <Card>
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-        {icon}
-      </CardHeader>
-      <KPIValue>{value}</KPIValue>
-      <TrendIndicator trend={trend}>
-        {trend > 0 ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
-        {Math.abs(trend)}% from last month
-      </TrendIndicator>
-    </Card>
-  );
+interface KPICardProps {
+  title: string;
+  value: string | number;
+  icon: React.ReactNode;
+  trend: number;
+}
+
+const KPICard: React.FC<KPICardProps> = ({ title, value, icon, trend }) => (
+  <Card>
+    <CardHeader>
+      <CardTitle>{title}</CardTitle>
+      {icon}
+    </CardHeader>
+    <KPIValue>{value}</KPIValue>
+    <TrendIndicator trend={trend}>
+      {trend > 0 ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+      {Math.abs(trend)}% from last month
+    </TrendIndicator>
+  </Card>
+);
 
   const handleDownload = () => {
-    html2canvas(document.querySelector("#report-container")).then(canvas => {
+    html2canvas(document.querySelector("#report-container") as HTMLElement).then(canvas => {
       const link = document.createElement('a');
       link.href = canvas.toDataURL('image/png');
       link.download = 'sales-report.png';
@@ -236,7 +265,7 @@ const SalesReport = () => {
             title="Revenue Growth" 
             value={`${kpis.revenueGrowth}%`} 
             icon={<TrendingUp color={colors.quaternary} />} 
-            trend={5.3} 
+            trend={kpis.revenueGrowth} 
           />
         </Grid>
 
@@ -249,5 +278,3 @@ const SalesReport = () => {
 };
 
 export default SalesReport;
-
-

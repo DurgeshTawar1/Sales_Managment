@@ -1,4 +1,3 @@
-// Sidebar.tsx
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { IconType } from "react-icons";
@@ -15,7 +14,6 @@ import {
   FaBars,
 } from "react-icons/fa";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
-// import "../styles/Sidebar.css";
 import styled from "styled-components";
 
 interface MenuItem {
@@ -83,7 +81,6 @@ const menuItems: MenuItem[] = [
     label: "Reports",
     subItems: [
       { label: "Sales Report", link: "/saslesreport" },
-      // { label: "Stock Report", link: "/stock-report" },
     ],
   },
 ];
@@ -92,8 +89,6 @@ interface SidebarProps {
   isOpen: boolean;
   toggleSidebar: () => void;
 }
-
-
 
 const SidebarContainer = styled.div<{ isOpen: boolean }>`
   width: ${props => props.isOpen ? "250px" : "60px"};
@@ -133,13 +128,36 @@ const SidebarHeading = styled.h1`
   margin: 0;
 `;
 
-const MenuItem = styled(Link)<{ isOpen: boolean }>`
+const MenuItemLink = styled(Link)<{ isOpen: boolean }>`
   display: flex;
   align-items: center;
   padding: 15px 20px;
   color: #ecf0f1;
   text-decoration: none;
   transition: all 0.3s ease;
+
+  &:hover {
+    background-color: #34495e;
+  }
+
+  svg {
+    font-size: 1.2rem;
+    margin-right: ${props => props.isOpen ? "15px" : "0"};
+  }
+
+  span {
+    display: ${props => props.isOpen ? "inline" : "none"};
+  }
+`;
+
+const MenuItemDiv = styled.div<{ isOpen: boolean }>`
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  color: #ecf0f1;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
 
   &:hover {
     background-color: #34495e;
@@ -171,6 +189,7 @@ const SubMenuItem = styled(Link)`
     background-color: #2c3e50;
   }
 `;
+
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
 
@@ -187,7 +206,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
       {menuItems.map((item) => (
         <div key={item.label}>
           {item.subItems ? (
-            <MenuItem as="div" onClick={() => toggleSubmenu(item.label)} isOpen={isOpen}>
+            <MenuItemDiv onClick={() => toggleSubmenu(item.label)} isOpen={isOpen}>
               <item.icon />
               {isOpen && (
                 <>
@@ -195,12 +214,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                   {openSubmenu === item.label ? <IoIosArrowUp /> : <IoIosArrowDown />}
                 </>
               )}
-            </MenuItem>
+            </MenuItemDiv>
           ) : (
-            <MenuItem to={item.link || "#"} isOpen={isOpen}>
+            <MenuItemLink to={item.link || "#"} isOpen={isOpen}>
               <item.icon />
               {isOpen && <span>{item.label}</span>}
-            </MenuItem>
+            </MenuItemLink>
           )}
           {item.subItems && openSubmenu === item.label && isOpen && (
             <SubMenu>

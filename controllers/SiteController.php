@@ -128,7 +128,7 @@ class SiteController extends Controller
 
     // Clear the session
     Yii::$app->session->destroy();
-
+   
     return $this->render('login', [
         'model' => $model,
     ]);

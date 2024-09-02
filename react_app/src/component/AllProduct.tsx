@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import DataTable from 'react-data-table-component';
 import { FaEdit, FaTrash } from 'react-icons/fa';
-import { getAllProducts , deleteProduct, updateProduct} from '../Api/ProductApi';
+import { getAllProducts , deleteProduct} from '../Api/ProductApi';
 import { toast } from 'react-toastify';
 interface ProductData {
   _id: string;  // Use the correct ID field from your API

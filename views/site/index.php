@@ -9,10 +9,14 @@ $this->title = 'Home';
 
     <div class="hero-section">
         <div class="hero-content">
-            <h1 class="display-4">Welcome to SalesEstream!</h1>
+            <h1 class="display-4">Welcome to SalesZone!</h1>
             <p class="lead">Elevate your sales strategy with cutting-edge tools and insights.</p>
             <p>
-                <?= Html::a('Boost Your Sales with SalesEstream', ['/react'], ['class' => 'btn btn-primary btn-lg']) ?>
+                <?php if (Yii::$app->user->isGuest): ?>
+                    <?= Html::a('Login first to Boost Your Sales with SalesZone', ['/site/login'], ['class' => 'btn btn-primary btn-lg']) ?>
+                <?php else: ?>
+                    <?= Html::a('Boost Your Sales with SalesEstream', ['/react'], ['class' => 'btn btn-primary btn-lg']) ?>
+                <?php endif; ?>
             </p>
         </div>
     </div>

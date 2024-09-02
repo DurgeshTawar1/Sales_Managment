@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { createProduct } from '../Api/ProductApi';
-import { getAllCategories } from '../Api/CategoryiesApi';
+import { createProduct, getAllProducts } from '../Api/ProductApi';
 import Barcode from 'react-barcode';
 import { toast } from 'react-toastify';
  
 interface Category {
-    id: string;
+    _id: string;
     categoryname: string;
 }
  
@@ -51,9 +50,11 @@ const AddProduct: React.FC = () => {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const fetchedCategories = await getAllCategories();
+                const fetchedCategories = await getAllProducts();
                 // toast.success("Product Added Successfulliy")
+                
                 setCategories(fetchedCategories);
+
                
             } catch (error) {
                 console.error('Error fetching categories:', error);
@@ -163,7 +164,7 @@ const AddProduct: React.FC = () => {
                         >
                             <option value="">Select</option>
                             {categories.map(category => (
-                                <option key={category.id} value={category.id}>
+                                <option key={category._id} value={category._id}>
                                     {category.categoryname}
                                 </option>
                             ))}

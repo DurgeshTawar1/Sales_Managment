@@ -6,8 +6,6 @@ import { FaEdit, FaTrash } from 'react-icons/fa';
 import DataTable from 'react-data-table-component';
 import { toast } from 'react-toastify';
 
-
-
 const Container = styled.div`
   max-width: 1200px;
   margin: 0 auto;
@@ -124,8 +122,6 @@ const ActionButton = styled.button`
   }
 `;
 
-
-
 const SalesTable: React.FC = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -141,17 +137,13 @@ const SalesTable: React.FC = () => {
   };
 
   const handleDelete = async(id: string) => {
-    // const confirmDelete = window.confirm('Are you sure you want to delete this product?');
-    // if (confirmDelete) {
-      try {
-        await deleteSale(id);
-        toast.success("Sale Deleted Successfulliy!")
-
-        setData(data.filter(product => product._id !== id)); // Remove deleted product from state
-      } catch (error) {
-        toast.error("Hoo no something went wrong!")
-        console.error('Error deleting product:', error);
-      // }
+    try {
+      await deleteSale(id);
+      toast.success("Sale Deleted Successfully!")
+      setData(data.filter(product => product._id !== id)); // Remove deleted product from state
+    } catch (error) {
+      toast.error("Oops, something went wrong!")
+      console.error('Error deleting product:', error);
     }
   };
 
@@ -159,7 +151,7 @@ const SalesTable: React.FC = () => {
     const fetchData = async () => {
       try {
         const response = await fetchAllSales();
-        setData(response); // Use response.data to set the data
+        setData(response); // Use response.data to set the data if necessary
       } catch (error) {
         console.error('Error fetching products:', error);
       } finally {
@@ -177,26 +169,15 @@ const SalesTable: React.FC = () => {
       cell: (row: Sale) => (
         <img
           src={row.uploadImage}
-          alt={row.uploadImage}
+          alt={row.customer} // Use a more descriptive alt text
           style={{ width: '50px', height: '50px', objectFit: 'cover' }} 
         />
       ),
       sortable: false, 
     },
-    { name: 'Price', selector: (row: Sale) => row.price, sortable: true },
-    { 
-      name: 'DisCount', 
-      selector: (row: Sale) => row.discount, 
-      sortable: true,
-      // format: (row: Sale) => row.productCost !== undefined ? `$${row.productCost.toFixed(2)}` : '$0.00'
-    },
-    { 
-      name: 'Status', 
-      selector: (row: Sale) => row.status, 
-      sortable: true,
-      // format: (row: Sale) => row.shipping !== undefined ? `$${row.sellPrice.toFixed(2)}` : '$0.00'
-    },
-    { name: 'Date', selector: (row: Sale) => new Date(row.createdAt).toLocaleDateString(), sortable: true },
+    { name: 'Price', selector: (row: Sale) => row.price[0], sortable: true }, // Assuming `price` is an array; adjust if necessary
+    { name: 'Discount', selector: (row: Sale) => row.discount, sortable: true },
+    { name: 'Status', selector: (row: Sale) => row.status, sortable: true },
     {
       name: 'Actions',
       cell: (row: Sale) => (
@@ -246,44 +227,43 @@ const SalesTable: React.FC = () => {
   };
 
   return (
-
     <Container>
-    <Banner>
-      <BannerTitle>Sales Inventory</BannerTitle>
-      <BannerSubtitle>Manage your sales efficiently</BannerSubtitle>
-    </Banner>
+      <Banner>
+        <BannerTitle>Sales Inventory</BannerTitle>
+        <BannerSubtitle>Manage your sales efficiently</BannerSubtitle>
+      </Banner>
 
-    <ButtonContainer>
-      <AddButton onClick={handleAddProduct}>Add Sale</AddButton>
-    </ButtonContainer>
+      <ButtonContainer>
+        <AddButton onClick={handleAddProduct}>Add Sale</AddButton>
+      </ButtonContainer>
 
-    <Alert>
-      <AlertIcon>⚠️</AlertIcon>
-      <AlertContent>
-        <AlertTitle>Inventory Update</AlertTitle>
-        <AlertDescription>
-          New Sale have been added to the inventory. Please review and update stock levels as needed.
-        </AlertDescription>
-      </AlertContent>
-    </Alert>
+      <Alert>
+        <AlertIcon>⚠️</AlertIcon>
+        <AlertContent>
+          <AlertTitle>Inventory Update</AlertTitle>
+          <AlertDescription>
+            New Sale have been added to the inventory. Please review and update stock levels as needed.
+          </AlertDescription>
+        </AlertContent>
+      </Alert>
 
-    {loading ? (
-      <LoaderWrapper>
-        <Loader />
-      </LoaderWrapper>
-    ) : (
-      <DataTable
-        columns={columns}
-        data={data}
-        pagination
-        paginationPerPage={5}
-        paginationRowsPerPageOptions={[5, 10, 15]}
-        highlightOnHover
-        responsive
-        customStyles={customStyles}
-      />
-    )}
-  </Container>
+      {loading ? (
+        <LoaderWrapper>
+          <Loader />
+        </LoaderWrapper>
+      ) : (
+        <DataTable
+          columns={columns}
+          data={data}
+          pagination
+          paginationPerPage={5}
+          paginationRowsPerPageOptions={[5, 10, 15]}
+          highlightOnHover
+          responsive
+          customStyles={customStyles}
+        />
+      )}
+    </Container>
   );
 };
 

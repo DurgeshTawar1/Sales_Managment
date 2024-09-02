@@ -9,7 +9,10 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import { getAllProducts } from '../Api/ProductApi';
 import { getAllExpense } from '../Api/Expense';
-import { toast } from 'react-toastify';
+// import { toast } from 'react-toastify';
+import { CustomerFormData, getAllCustomers } from '../Api/CustomerApi';
+import { getAllSuppliers, Supplier } from '../Api/SupplierApi';
+import { fetchAllSales, Sale } from '../Api/SaleApi';
 
 // Define the interface for the props
 interface StatCardProps {
@@ -18,6 +21,8 @@ interface StatCardProps {
   color: string;
   trend: 'up' | 'down'; // Enum-like string union type for trend
 }
+
+
 // Enhanced theme configuration
 const theme = createTheme({
   palette: {
@@ -61,7 +66,7 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, color, trend }) => (
   </Paper>
 );
  
-// Stacked Area Chart Component (unchanged)
+// // Stacked Area Chart Component (unchanged)
 const StackedAreaChart = () => {
   const data = [
     { month: 'Jan', Electronics: 4000, Clothing: 2400, Books: 2400 },
@@ -97,11 +102,15 @@ const StackedAreaChart = () => {
   );
 };
  
+
+
+
+
 // Pie Chart Component (unchanged)
 const PieChartComponent = () => {
   
   const data = [
-    { name: 'Product A', value: 400 },
+    { name: 'Customer', value: 200},
     { name: 'Product B', value: 300 },
     { name: 'Product C', value: 300 },
     { name: 'Product D', value: 200 },
@@ -133,13 +142,17 @@ const PieChartComponent = () => {
     </ResponsiveContainer>
   );
 };
+
+
+
+
  
 // Product Table Component (unchanged)
 const ProductTable = () => {
   const columns : GridColDef[] = [
     { field: 'id', headerName: 'ID', width: 70 },
     { field: 'name', headerName: 'Product Name', width: 200 },
-    { field: 'category', headerName: 'Category', width: 130 },
+    { field: 'categoryName', headerName: 'Category', width: 130 },
     { field: 'price', headerName: 'Price', type: 'number', width: 90 },
     { field: 'stock', headerName: 'Stock', type: 'number', width: 90 },
   ];
@@ -257,58 +270,153 @@ const SupplierSlider = () => {
 };
  
 // Main Dashboard Component
+// Define interfaces for your data
+interface Product {
+  id: number;
+  name: string;
+  sellPrice: number;
+  productCost: number;
+  // Add other relevant fields
+}
+
+
+
 const Dashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
   // const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const [product, setProduct] = useState<any[]>([]); // Initialize as an empty array
-  const [expense, setExpense] = useState<any[]>([]);
+  const [product, setProduct] = useState<Product[]>([]); // Initialize as an empty array
+  const [totalProfit, setTotalProfit] = useState<number>(0);
+  const [totalExpense, setTotalExpense] = useState<number>(0);
+  const [customer, setCustomer] = useState<CustomerFormData[]>([]);
+  const [supplier, setSupplier] = useState<Supplier[]>([]);
+  const [salesData, setSalesData] = useState<Sale[]>([]); // New state for sales data
 
   // const [loading, setLoading] = useState(false)
+
+
  
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
  
  console.log(toggleSidebar);
- useEffect(() => {
-  const totalproducts = async () => {
+//  useEffect(() => {
+//   const totalproducts = async () => {
+//     try {
+//       const response = await getAllProducts();
+      
+//       setProduct(response.data); // Use response.data to set the data
+      
+//     } catch (error) {
+//       console.error('Error fetching products:', error);
+//     // } 
+//     }
+//   };
+
+//   totalproducts();
+// }, []);
+
+useEffect(() => {
+  const fetchProducts = async () => {
     try {
       const response = await getAllProducts();
-      setProduct(response.data); // Use response.data to set the data
+      
+      // Assuming response.data is an array of products
+      const fetchedProducts: Product[] = response.data;
+      setProduct(fetchedProducts);
+      
+      // Calculate total profit
+      const profit = fetchedProducts.reduce((acc: number, product: Product) => {
+        const productProfit = product.sellPrice - product.productCost;
+        return acc + productProfit;
+      }, 0);
+      
+      setTotalProfit(profit);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    }
+  };
+
+  fetchProducts();
+}, []);
+
+
+
+
+useEffect(() => {
+  const fetchTotalExpense = async () => {
+    try {
+      const response = await getAllExpense();
+      console.log('Expense Data:', response); // Log the entire response
+
+      // Check if response.data or response.data.data contains the expected data
+      const expenseData = response;
+
+      if (Array.isArray(expenseData)) {
+        const total = expenseData.reduce((acc: number, expense) => {
+          // Convert 'cost' to number
+          const cost = parseFloat(expense.cost);
+          return acc + (isNaN(cost) ? 0 : cost);
+        }, 0);
+        setTotalExpense(total);
+      } else {
+        console.error('Expected an array but received:', expenseData);
+          setTotalExpense(0);
+        }
+      } catch (error) {
+        console.error('Error fetching Expense:', error);
+        setTotalExpense(0);
+      }
+    };
+    fetchTotalExpense();
+  }, []);
+
+ 
+
+useEffect(() => {
+  const totalCustomer = async () => {
+    try {
+      const data = await getAllCustomers();
+
+      setCustomer(data); // Use response.data to set the data
+
     } catch (error) {
       console.error('Error fetching products:', error);
     // } 
     }
   };
 
-  totalproducts();
+  totalCustomer();
 }, []);
 
-
 useEffect(() => {
-  const totalExpense = async () => {
+  const totalSupplier = async () => {
     try {
-      const response = await getAllExpense();
-      // console.log("res", response)
-      console.log('Expense Data:', response.data); // Check what is returned
-      if (Array.isArray(response.data)) {
-        setExpense(response.data); // Update state with fetched data
-
-      } else {
-        console.error('Expected an array but received:', response.data);
-        toast.error("error")
-      }
-
-      setExpense(response.data); // Use response.data to set the data
+      const response = await getAllSuppliers();
+      setSupplier(response); // Use response.data to set the data
     } catch (error) {
-      console.error('Error fetching Expense:', error);
+      console.error('Error fetching products:', error);
     // } 
     }
   };
 
-  totalExpense();
+  totalSupplier();
 }, []);
- 
+
+useEffect(() => {
+  const fetchSalesData = async () => {
+    try {
+      const response = await fetchAllSales();
+      setSalesData(response);
+    } catch (error) {
+      console.error('Error fetching sales data:', error);
+    }
+  };
+
+  fetchSalesData();
+}, []);
+console.log(salesData);
+
   return (
     <ThemeProvider theme={theme}>
       <Box sx={{
@@ -328,16 +436,22 @@ useEffect(() => {
               <StatCard title="Total Products" value={product.length} color={theme.palette.primary.main} trend="up" />
             </Grid>
             <Grid item xs={12} sm={6} md={4} lg={2.4}>
-              <StatCard title="Total Expense" value="10" color={theme.palette.secondary.main} trend="down" />
+            <StatCard 
+                title="Total Expense" 
+                value={`$${totalExpense.toFixed(2)}`} 
+                color={theme.palette.secondary.main} 
+                trend="down" 
+              />
             </Grid>
             <Grid item xs={12} sm={6} md={4} lg={2.4}>
-              <StatCard title="Total Customers" value="10,200" color={theme.palette.info.main} trend="up" />
+              <StatCard title="Total Customers" value={customer.length} color={theme.palette.info.main} trend="up" />
             </Grid>
             <Grid item xs={12} sm={6} md={4} lg={2.4}>
-              <StatCard title="Total Profit" value="$85,000" color={theme.palette.success.main} trend="up" />
+            <StatCard title="Total Profit" value={`$${totalProfit.toFixed(2)}`} color={theme.palette.success.main} trend="up" />
+s
             </Grid>
             <Grid item xs={12} sm={6} md={4} lg={2.4}>
-              <StatCard title="Total Suppliers" value="150" color={theme.palette.success.dark} trend="up" />
+              <StatCard title="Total Suppliers" value={supplier.length} color={theme.palette.success.dark} trend="up" />
             </Grid>
            
             <Grid item xs={12}>

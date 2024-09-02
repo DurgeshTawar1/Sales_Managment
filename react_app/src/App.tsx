@@ -21,6 +21,8 @@ import AddSupplier from './component/AddSupplier';
 import SupplierTable from './component/AllSupplier';
 import DashBoard from './component/DashBoard';
 import SalesReport from './component/Salesreport';
+import PrivateRoute from './component/PrivateRoute';
+// import ScreenshotTaker from './component/ScreenshotTaker';
 
 const App: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -28,23 +30,29 @@ const App: React.FC = () => {
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
-
+  const isAuthenticated = (): boolean => {
+    const token = localStorage.getItem('authToken');
+    return token !== null;
+  };
+  
   return (
     <Router basename='/react'>
       <div>
         <Navbar onToggleSidebar={toggleSidebar} isSidebarOpen={sidebarOpen} />
         <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
         
-       
+       {/* <ScreenshotTaker/> */}
         <Routes>
-          <Route path="/" element={<DashBoard />} />
+          <Route path="/" element={<PrivateRoute isAuthenticated={isAuthenticated()} element={<DashBoard />}  />}/>
           <Route path="/dashboard" element={<DashBoard />} />
           {/* <Route path="/" element={<h1>Home Page</h1>} /> */}
-          <Route path="/add-customer" element={<AddCustomerForm />} />
+                {/* <Route path="/add-customer" element={<PrivateRoute isAuthenticated={isAuthenticated()} element={<AddCustomerForm />} />} /> */}
+ 
+          <Route path="/add-customer"  element={<AddCustomerForm />} />
           <Route path="/all-customer" element={<AllCustomer />} />
-          <Route path="/add-product" element={<AddProduct />} />
+          <Route path="/add-product"  element={<PrivateRoute isAuthenticated={isAuthenticated()}  element={<AddProduct />} />}/>
           <Route path="/all-product" element={<AllProduct />} />
-          <Route path="/add-category" element={<AddCategory />} />
+          <Route path="/add-category"  element={<AddCategory />} />
           <Route path="/all-category" element={<AllcategoryTable />} />
           <Route path="/add-purchase" element={<AddPurchase />} />
           <Route path="/all-purchase" element={<PurchaseTable />} />

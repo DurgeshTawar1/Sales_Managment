@@ -16,7 +16,7 @@ import axios from 'axios';
 
 // Define the CustomerFormData type for form submission
 export interface CustomerFormData {
-    id:number,
+    id?:number,
     customerName: string;
     customerContact: string;
     gender: string;
@@ -34,7 +34,8 @@ const API_BASE_URL = 'http://localhost:4000/api/v1/customer';
 export const getAllCustomers = async (): Promise<CustomerFormData[]> => {
     try {
         const response = await axios.get(`${API_BASE_URL}/getallcustomer`);
-        return response.data.data;
+        console.log("hh",response.data)
+        return response.data;
     } catch (error) {
         throw new Error(`Error fetching customers: ${(error as Error).message}`);
     }
@@ -59,7 +60,7 @@ export const createCustomer = async (customerData: CustomerFormData): Promise<Cu
 };
 
 // Update a customer by ID
-export const updateCustomerById = async (id: string, updatedCustomer: Partial<CustomerFormData>): Promise<CustomerFormData> => {
+export const updateCustomerById = async (id: number, updatedCustomer: Partial<CustomerFormData>): Promise<CustomerFormData> => {
     try {
         const response = await axios.put(`${API_BASE_URL}/editcustomer/${id}`, updatedCustomer);
         return response.data.data;
@@ -70,7 +71,7 @@ export const updateCustomerById = async (id: string, updatedCustomer: Partial<Cu
 
 
 
-export const deletecustomer = async (id: string): Promise<void>  => {
+export const deletecustomer = async (id: number): Promise<void>  => {
   try {
       const response = await axios.delete(`${API_BASE_URL}/deletecustomer/${id}`);
       return response.data;

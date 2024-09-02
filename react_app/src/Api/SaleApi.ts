@@ -51,6 +51,7 @@ export const fetchAllSales = async (): Promise<Sale[]> => {
   }
 };
 
+
 // Get a single sale by ID
 export const fetchSaleById = async (id: string): Promise<Sale> => {
   try {

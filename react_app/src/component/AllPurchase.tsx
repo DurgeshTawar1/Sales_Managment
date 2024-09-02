@@ -183,7 +183,7 @@ const PurchaseTable: React.FC = () => {
     { name: 'Product Cost', selector: (row: Purchase) => row.productCost, sortable: true },
     { name: 'Sell Price', selector: (row: Purchase) => row.sellPrice, sortable: true },
     { name: 'Expiry', selector: (row: Purchase) => row.productExpiry, sortable: true },
-    { name: 'purchaseDate', selector: (row: Purchase) => new Date(row.createdAt).toLocaleDateString(), sortable: true },
+    // { name: 'purchaseDate', selector: (row: Purchase) => new Date(row.createdAt).toLocaleDateString(), sortable: true },
     {
       name: 'Actions',
       cell: (row: Purchase) => (

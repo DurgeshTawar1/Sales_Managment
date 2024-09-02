@@ -149,8 +149,8 @@ const AllCustomer: React.FC = () => {
     }, []);
 
     
-    const handleEdit = (id: number) => {
-        console.log('Edit customer with id:', id);
+    const handleEdit = (_id: number) => {
+        console.log('Edit customer with id:', _id);
         // Implement edit functionality here
     };
 
@@ -178,13 +178,13 @@ const AllCustomer: React.FC = () => {
         { name: 'Contact No', selector: (row: CustomerFormData) => row.customerContact, sortable: true },
         { name: 'Email', selector: (row: CustomerFormData) => row.customerEmail, sortable: true },
         { name: 'Address', selector: (row: CustomerFormData) => row.location, sortable: true },
-        { name: 'Date Added', selector: (row: CustomerFormData) => new Date(row.createdAt).toLocaleDateString(), sortable: true },
+        // { name: 'Date Added', selector: (row: CustomerFormData) => new Date(row.createdAt).toLocaleDateString(), sortable: true },
         {
           name: 'Actions',
           cell: (row: CustomerFormData) => (
             <>
-              <ActionButton onClick={() => handleEdit(row.id)}><FaEdit /></ActionButton>
-              <ActionButton onClick={() => handleDelete(row.id)}><FaTrash /></ActionButton>
+              <ActionButton onClick={() => handleEdit(row.id as number)}><FaEdit /></ActionButton>
+              <ActionButton onClick={() => handleDelete(row.id as number )}><FaTrash /></ActionButton>
             </>
           ),
         },
