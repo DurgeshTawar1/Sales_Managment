@@ -22,6 +22,7 @@ import SupplierTable from './component/AllSupplier';
 import DashBoard from './component/DashBoard';
 import SalesReport from './component/Salesreport';
 import PrivateRoute from './component/PrivateRoute';
+import Chat from './component/Chat';
 // import ScreenshotTaker from './component/ScreenshotTaker';
 
 const App: React.FC = () => {
@@ -40,29 +41,29 @@ const App: React.FC = () => {
       <div>
         <Navbar onToggleSidebar={toggleSidebar} isSidebarOpen={sidebarOpen} />
         <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
-        
+         <Chat/>
        {/* <ScreenshotTaker/> */}
         <Routes>
-          <Route path="/" element={<PrivateRoute isAuthenticated={isAuthenticated()} element={<DashBoard />}  />}/>
-          <Route path="/dashboard" element={<DashBoard />} />
+          <Route path="/" element={<PrivateRoute isAuthenticated={isAuthenticated()}  element={<DashBoard />} /> }  />
+          <Route path="/dashboard" element={<PrivateRoute isAuthenticated={isAuthenticated()}  element={<DashBoard />} /> }/>
           {/* <Route path="/" element={<h1>Home Page</h1>} /> */}
                 {/* <Route path="/add-customer" element={<PrivateRoute isAuthenticated={isAuthenticated()} element={<AddCustomerForm />} />} /> */}
  
-          <Route path="/add-customer"  element={<AddCustomerForm />} />
-          <Route path="/all-customer" element={<AllCustomer />} />
-          <Route path="/add-product"  element={<PrivateRoute isAuthenticated={isAuthenticated()}  element={<AddProduct />} />}/>
-          <Route path="/all-product" element={<AllProduct />} />
-          <Route path="/add-category"  element={<AddCategory />} />
-          <Route path="/all-category" element={<AllcategoryTable />} />
-          <Route path="/add-purchase" element={<AddPurchase />} />
-          <Route path="/all-purchase" element={<PurchaseTable />} />
-          <Route path="/add-sale" element={<AddSale />} />
-          <Route path="/all-sale" element={<SalesTable />} />
-          <Route path="/add-expense" element={<AddExpense />} />
-          <Route path="/add-income" element={<AddIncome />} />
-          <Route path="/add-supplier" element={<AddSupplier />} />
-          <Route path="/all-supplier" element={<SupplierTable />} />
-          <Route path="/saslesreport" element={<SalesReport />} />
+          <Route path="/add-customer" element={<PrivateRoute isAuthenticated={isAuthenticated()} element={<AddCustomerForm />} /> }/>
+          <Route path="/all-customer" element={<PrivateRoute isAuthenticated={isAuthenticated()}  element={<AllCustomer />} /> }/>
+          <Route path="/add-product"  element={<PrivateRoute isAuthenticated={isAuthenticated()}  element={<AddProduct />}  /> }/>
+          <Route path="/all-product" element={<PrivateRoute isAuthenticated={isAuthenticated()} element={<AllProduct />} /> } />
+          <Route path="/add-category" element={<PrivateRoute isAuthenticated={isAuthenticated()}   element={<AddCategory />} /> }/>
+          <Route path="/all-category" element={<PrivateRoute isAuthenticated={isAuthenticated()}  element={<AllcategoryTable />} /> } />
+          <Route path="/add-purchase" element={<PrivateRoute isAuthenticated={isAuthenticated()}  element={<AddPurchase />} /> }/>
+          <Route path="/all-purchase" element={<PrivateRoute isAuthenticated={isAuthenticated()} element={<PurchaseTable />} /> }/>
+          <Route path="/add-sale" element={<PrivateRoute isAuthenticated={isAuthenticated()} element={<AddSale />} /> } />
+          <Route path="/all-sale" element={<PrivateRoute isAuthenticated={isAuthenticated()}  element={<SalesTable />} /> }/>
+          <Route path="/add-expense" element={<PrivateRoute isAuthenticated={isAuthenticated()}  element={<AddExpense />} /> }/>
+          <Route path="/add-income" element={<PrivateRoute isAuthenticated={isAuthenticated()}  element={<AddIncome />}  /> }/>
+          <Route path="/add-supplier"  element={<PrivateRoute isAuthenticated={isAuthenticated()} element={<AddSupplier />} /> }/>
+          <Route path="/all-supplier" element={<PrivateRoute isAuthenticated={isAuthenticated()}  element={<SupplierTable />} /> }/>
+          <Route path="/saslesreport" element={<PrivateRoute isAuthenticated={isAuthenticated()}  element={<SalesReport />} /> }/>
         </Routes>
         </div>
       
