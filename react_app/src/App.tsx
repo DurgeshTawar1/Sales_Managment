@@ -41,7 +41,7 @@ const App: React.FC = () => {
       <div>
         <Navbar onToggleSidebar={toggleSidebar} isSidebarOpen={sidebarOpen} />
         <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
-         <Chat/>
+{/*          <Chat/> */}
        {/* <ScreenshotTaker/> */}
         <Routes>
           <Route path="/" element={<PrivateRoute isAuthenticated={isAuthenticated()}  element={<DashBoard />} /> }  />
